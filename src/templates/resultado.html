@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block h1 %}
+<h1>Tu sine sweep está listo</h1>
+
+  <!--Reproducción inline -->
+  <audio controls>
+    <source src="data:audio/wav;base64,{{ audio_b64 }}" type="audio/wav">
+    Tu navegador no soporta reproducción de audio.
+  </audio>
+
+  <!--Enlace de descarga -->
+  <p>
+    <a href="data:audio/wav;base64,{{ audio_b64 }}" download="{{ filename }}">
+      Descargar archivo WAV
+    </a>
+  </p>
+
+  <p><a href="{{ url_for('probar_page') }}">← Generar otro sweep</a></p>
+{% endblock %}

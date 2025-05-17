@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block h1 %}
+<h3>Generar Sine Sweep</h3>
+  <form action="{{ url_for('generar') }}" method="post" enctype="multipart/form-data">
+    <label>Duración (s):
+      <input type="number" step="0.1" name="duracion" required>
+    </label>
+    <label>Freq. inferior (Hz):
+      <input type="number" step="1" name="f_inferior" value="20" required>
+    </label>
+    <label>Freq. superior (Hz):
+      <input type="number" step="1" name="f_superior" value="20000" required>
+    </label><br><br>
+    <button type="submit">Generar Sweep</button>
+  </form>
+
+{% endblock %}
