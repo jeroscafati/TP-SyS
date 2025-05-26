@@ -2,6 +2,9 @@ import numpy as np
 import pandas as pd
 import soundfile as sf
 import matplotlib.pyplot as plt
+from io import BytesIO
+import base64
+from soundfile import write
 
 def ruidoRosa_voss(t, ncols=16, fs=44100):
     """
@@ -60,40 +63,73 @@ def ruidoRosa_voss(t, ncols=16, fs=44100):
     sf.write('ruidoRosa.wav', total,fs)
     return total
 
-def plot_signal(signal, fs=44100, start=0.0, end=None):
+def graficar_dominio_temporal(t, signal):
+
     """
-    Visualiza el dominio temporal de una señal.
+    Grafica el dominio temporal de la señal
+    
+    Parámetros
+    ----------
+    señal : array
+        Señal a graficar.
+    fs : int
+        Frecuencia de muestreo de la señal. Por defecto es 44100 Hz.
+    
+    returns: None
+        Grafica la señal en el dominio temporal.
+    
+    Ejemplo
+    -------
+    Graficar el dominio temporal de una señal de ruido rosa.
+    
+        import numpy as np
+        import matplotlib.pyplot as plt
+
+        graficar_dominio_temporal(ruidoRosa_voss(10))
+    """
+    plt.figure(figsize=(10, 4))
+    plt.plot(t, signal, color='m')
+    plt.title('Señal en el dominio temporal')
+    plt.xlabel('Tiempo [s]')
+    plt.ylabel('Amplitud')
+    plt.grid(True)
+    plt.show()
+    return None
+
+def generar_sweep_inverse(duracion,fs=44100 ,f_inferior=20 ,f_superior=20000):
+
+    
+    """
+    Genera un barrido logarítmico de frecuencias (sine sweep) y un filtro inverso, entre f_inferior y f_superior.
 
     Parámetros
     ----------
-    signal : numpy.ndarray
-        Vector de datos de la señal.
+    duracion : float
+        Duración del barrido en segundos.
     fs : int, opcional
-        Frecuencia de muestreo en Hz (por defecto 44100).
-    start : float, opcional
-        Tiempo inicial en segundos para la visualización (por defecto 0.0).
-    end : float or None, opcional
-        Tiempo final en segundos para la visualización. Si es None, muestra hasta el final.
+        Frecuencia de muestreo en Hz. Por defecto es 44100 Hz.
+    f_inferior : float, opcional
+        Frecuencia inferior del barrido en Hz. Por defecto es 20 Hz.
+    f_superior : float, opcional
+        Frecuencia superior del barrido en Hz. Por defecto es 20000 Hz.
+
+    Returns
+    -------
+    sweep : np.ndarray
+        Señal generada del barrido logarítmico normalizada.
+
+    inverse_sweep : np.ndarray
+        Señal generada del barrido logarítmico inverso normalizada.
+    
+    fs : int
+        Frecuencia de muestreo utilizada.
+
+    Ejemplo
+    -------
+    Generar un barrido logarítmico de frecuencias entre 20 Hz y 20000 Hz durante 10 segundos:
+
+        sweep, inverse, fs = generar_sweep_inverse(10)
     """
-    # Convertir tiempos a índices
-    start_idx = int(start * fs)
-    end_idx = int(end * fs) if end is not None else len(signal)
-
-    t = np.linspace(start, start + (end_idx - start_idx) / fs,
-                    num=end_idx - start_idx, endpoint=False)
-
-    plt.style.use('ggplot')
-    plt.figure(figsize=(10, 4))
-    plt.plot(t, signal[start_idx:end_idx])
-    plt.xlabel('Tiempo [s]')
-    plt.ylabel('Amplitud')
-    plt.title('Dominio temporal de la señal')
-    plt.grid(True)
-    plt.tight_layout()
-    plt.show()
-
-def generar_sweep(duracion,fs=44100 ,f_inferior=20 ,f_superior=20000):
-
     R = np.log(f_superior/f_inferior)
     muestras = int(duracion * fs)
     L = duracion/R
@@ -102,20 +138,19 @@ def generar_sweep(duracion,fs=44100 ,f_inferior=20 ,f_superior=20000):
     #Generacion de vectores con numpy
     t = np.linspace(0, duracion, muestras, endpoint=False)
     sweep = np.sin(K * (np.exp(t/L) - 1 ))
+    #Generacion de vectores con numpy
+    m_t = f_inferior/((K/L) *(np.exp(t/L)))
+    m_t *= sweep[::-1]
+    inverse_sweep = m_t
 
     # Normalización, para evitar saturacion al reproducir
     sweep /= np.max(np.abs(sweep))
+    inverse_sweep /= np.max(np.abs(inverse_sweep))
 
-    return sweep.astype(np.float32), fs
+    return sweep.astype(np.float32), inverse_sweep.astype(np.float32), fs
 
-def generar_inv_Sweep(duracion, fs=44100, f_inferior=20, f_superior=20000):
-    R = np.log(f_superior / f_inferior)
-    L = duracion / R
-    K = L * 2 * np.pi * f_inferior
-    muestras = int(duracion * fs)
-
-    # Generacion de vectores con numpy
-    t = np.linspace(0, duracion, muestras, endpoint=False)
-    w_t = 2 * np.pi * f_inferior * np.exp(t/L)
-
-    sweep = np.sin(K * (np.exp(t / L) - 1))
+def wav_to_b64(signal, fs):
+    buf = BytesIO()
+    write(buf, signal, fs, format='WAV')
+    buf.seek(0)
+    return base64.b64encode(buf.read()).decode('ascii')
