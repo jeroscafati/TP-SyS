@@ -24,3 +24,7 @@ body {
   padding: 0 1rem !important;          
   font-size: 1.1rem !important;   
 }
+#materia {
+  background-color: #0e1c37;
+    color: #f2f2f2;
+}
