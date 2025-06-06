@@ -1,4 +1,61 @@
 {% extends 'base.html' %}
 {% block body %}
-<h1>Cálculo de parámetros acústicos ISO 3382</h1>
+<section id="banner" class="oculto">
+    <div class="container">
+    <h1>Cálculo de parámetros acústicos ISO 3382</h1>
+    <p>Grupo 2</p>
+    </div>
+</section>
+<section class="container oculto">
+    <div class="row align-items-center text-center">
+        <div class="col">
+            <img src="/img/signal.png" alt="ISO 3382" class="img-fluid">
+        </div>
+        <div class="col-md-6">
+            <h2>¿Qué es la ISO 3382?</h2>
+            <p>La norma ISO 3382 establece métodos para medir y calcular 
+                parámetros acústicos en salas, como el tiempo de reverberación y la claridad del sonido.</p>
+        </div>
+    </div><br>
+    <div class="row align-items-center text-center">
+        <div class="col">
+            <h2>Que pingo es esto?</h2>
+            <p>La norma ISO 3382, se ve desde una perspectiva muy interesante</p>
+        </div>
+        <div class="col">
+            <img src="/img/sine-wave.jpg" alt="ISO 3382" class="img-fluid">
+        </div>
+    </div><br>
+</section>
+<section id="info" class="oculto">
+    <div class="container">
+        <h2 class="title">¿Que hacemos?</h2><br>
+        <div class="row text-center">
+            <div class="col">
+                <h3>Obtencion RI</h3>
+                <p>La norma ISO 3382 define métodos para medir y calcular 
+                    parámetros acústicos en salas, como el tiempo de reverberación y la claridad del sonido.</p>
+            </div>
+            <div class="col">
+                <h3>Parametros acústicos</h3>
+                <p>Utilizando un micrófono y un altavoz, se mide el sonido en 
+                    diferentes puntos de la sala para calcular los parámetros acústicos.</p>
+            </div>
+            <div class="col">
+                <h3>tu vieja</h3>
+                <p>Utilizando un micrófono y un altavoz, se mide el sonido en 
+                    diferentes puntos de la sala para calcular los parámetros acústicos.</p>
+            </div>
+        </div><br>
+        <div class="row justify-content-center">
+            <div class="col-auto">
+                <button class="btn btn-dark btn-lg" href="{{ url_for('probar_page') }}">
+                    Obtener IR</button>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-dark btn-lg" href="{{ url_for('probar_page') }}">
+                    Cargar IR</button>
+            </div>
+        </div>
+</section>
 {% endblock %}

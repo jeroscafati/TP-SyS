@@ -63,39 +63,6 @@ def ruidoRosa_voss(t, ncols=16, fs=44100):
     sf.write('ruidoRosa.wav', total,fs)
     return total
 
-def graficar_dominio_temporal(t, signal):
-
-    """
-    Grafica el dominio temporal de la señal
-    
-    Parámetros
-    ----------
-    señal : array
-        Señal a graficar.
-    fs : int
-        Frecuencia de muestreo de la señal. Por defecto es 44100 Hz.
-    
-    returns: None
-        Grafica la señal en el dominio temporal.
-    
-    Ejemplo
-    -------
-    Graficar el dominio temporal de una señal de ruido rosa.
-    
-        import numpy as np
-        import matplotlib.pyplot as plt
-
-        graficar_dominio_temporal(ruidoRosa_voss(10))
-    """
-    plt.figure(figsize=(10, 4))
-    plt.plot(t, signal, color='m')
-    plt.title('Señal en el dominio temporal')
-    plt.xlabel('Tiempo [s]')
-    plt.ylabel('Amplitud')
-    plt.grid(True)
-    plt.show()
-    return None
-
 def generar_sweep_inverse(duracion,fs=44100 ,f_inferior=20 ,f_superior=20000):
 
     

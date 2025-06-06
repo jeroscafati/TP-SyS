@@ -1,4 +1,7 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, Response
+import numpy as np
+import matplotlib.pyplot as plt
+import io
 from utils.primero import generar_sweep_inverse, wav_to_b64
 
 
@@ -11,6 +14,10 @@ def home_page():
 @app.route('/probar', methods=['GET'])
 def probar_page():
     return render_template('probar.html')
+
+@app.route("/analizar_RI", methods=['GET'])
+def analizar_RI_page():
+    return render_template('analizar_RI.html')
 
 @app.route('/generar', methods=['POST'])
 def generar():
@@ -33,9 +40,24 @@ def generar():
 def file_upload():
     return "chetomal"
 
-@app.route('/info')
-def info_page():
-    return render_template('info.html')
+@app.route("/plot")
+def plot():
+    # Ejemplo simple de gráfico; adaptalo a tu función real
+    x = np.linspace(0, 2 * np.pi, 300)
+    y = np.sin(2 * x)
+
+    fig, ax = plt.subplots(figsize=(5,3))
+    ax.plot(x, y, linewidth=2)
+    ax.set_title("Ejemplo: y = sin(2x)")
+    ax.grid(True)
+
+    buf = io.BytesIO()
+    fig.tight_layout()
+    fig.savefig(buf, format="png")
+    buf.seek(0)
+    plt.close(fig)
+
+    return Response(buf.getvalue(), mimetype="image/png")
 
 if __name__=='__main__':
     app.run(debug=True)
