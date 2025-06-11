@@ -13,4 +13,52 @@
 </audio>
 <p>Descargar: <a href="data:audio/wav;base64,{{ audio_inverse_b64 }}" download="{{ filename_inverse }}">Inverse</a></p>
   <p><a href="{{ url_for('probar_page') }}">← Generar otro sweep</a></p>
+  <h1>Flask + Matplotlib en un Popup</h1>
+  <p>Presioná el botón para generar el gráfico y verlo en un modal:</p>
+
+  <!-- BOTÓN que activa el popup -->
+  <button id="btnMostrarGrafico">Mostrar gráfico</button>
+
+  <!-- El “Modal” oculto por defecto -->
+  <div id="miModal">
+    <div id="modalContenido">
+      <!-- Botón para cerrar el modal -->
+      <button id="cerrarBtn">&times;</button>
+      <!-- Aquí se cargará la imagen del gráfico -->
+      <img id="grafico" src="" alt="Grafico dinámico" />
+    </div>
+  </div>
+
+  <script>
+    // 1. Referencias a elementos del DOM
+    const btn = document.getElementById("btnMostrarGrafico");
+    const modal = document.getElementById("miModal");
+    const cerrar = document.getElementById("cerrarBtn");
+    const imagenGrafico = document.getElementById("grafico");
+
+    // 2. Al hacer clic en “Mostrar gráfico”
+    btn.addEventListener("click", function() {
+      // Asignamos la ruta '/plot' al src de la imagen
+      // Esto dispara que el navegador haga una petición GET a /plot
+      imagenGrafico.src = "/plot?" + new Date().getTime();
+      // Nota: le agregamos un parámetro con timestamp para evitar caché
+      // si querés regenerar el gráfico cada vez sin reutilizar uno anterior.
+      // Luego, mostramos el modal:
+      modal.style.display = "block";
+    });
+
+    // 3. Al hacer clic en la “X” o en cualquier zona fuera del contenido, cerramos el modal
+    cerrar.addEventListener("click", function() {
+      modal.style.display = "none";
+      imagenGrafico.src = "";  // Limpiar el src por si queremos recargar luego
+    });
+
+    // 4. Si el usuario hace clic fuera del cuadro de contenido, también cierra
+    window.addEventListener("click", function(event) {
+      if (event.target === modal) {
+        modal.style.display = "none";
+        imagenGrafico.src = "";
+      }
+    });
+  </script>
 {% endblock %}
