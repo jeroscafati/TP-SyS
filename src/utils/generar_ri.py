@@ -1,11 +1,7 @@
-from ipywidgets import Button
-from tkinter import Tk, filedialog
-from IPython.display import clear_output, display
 import soundfile as sf
 import numpy as np
-from sounds import generar_inverseSweep, generar_sweep
 from scipy import signal
-from graph import graficar_dominio_temporal
+
 
 def ri_sintetizada(frecuencias: dict,fs=44100):
     """
@@ -43,6 +39,7 @@ def ri_sintetizada(frecuencias: dict,fs=44100):
     ri_int16 = (ri_sintetizada * 32767).astype(np.int16)
     sf.write('./audios/ri_sintetizada.wav', ri_int16, fs)
     return ri_sintetizada
+
 def ri_sweep(grabacion, filtro_inverso,filename="RI_sweep.wav",fs=44100):
     """
     Devuelve la respuesta al impulso h[n] = (grabacion * filtro_inverso) en el dominio del tiempo,
@@ -84,11 +81,8 @@ def ri_sweep(grabacion, filtro_inverso,filename="RI_sweep.wav",fs=44100):
     sf.write(filename,RI, fs)
 
     return RI
-sweep,fs = sf.read("audios/sweep_aulaInformatica.wav") 
-#h = sweep.shape[0]/fs
-#inverse = generar_inverseSweep(h)
-#ri_sweep_con_filtro = ri_sweep(sweep,inverse, filename="RI_aulaInformatica.wav")
-def filtros_norma_IEC61260(audiodata, fs, tipo_filtro='octava', orden_filtro=4):
+
+def filtrar_signal(audiodata, fs, tipo_filtro='octava', orden_filtro=4):
     """
     Filtra una señal de audio en bandas de octava o tercio de octava según la norma IEC 61260.
 
@@ -140,28 +134,26 @@ def filtros_norma_IEC61260(audiodata, fs, tipo_filtro='octava', orden_filtro=4):
         print(f"  Filtrada banda de {centerFrequency_Hz} Hz (cortes: {lowerCutoffFrequency_Hz:.2f}-{upperCutoffFrequency_Hz:.2f} Hz)")
 
     return señales_filtradas
+
 def escala_log(ri):
     """
-    Convierte la respuesta al impulso (ri) a escala logarítmica normalizada
+    Convierte la respuesta al impulso (ri) a escala logarítmica normalizada.
 
-    parámetros:
+    Parámetros:
     ri (numpy array): señal de respuesta al impulso
 
-    retorna:
-    - r: (numpy array) señal transformada a escala logarítmica
+    Retorna:
+    - r (numpy array): señal transformada a escala logarítmica
     """
+    a_max = np.max(np.abs(ri))
 
-    a_max = np.max(np.abs(ri)) 
-    
-    # Calcular la señal en escala logarítmica
-    r = 20 * np.log10(np.abs(ri) / a_max) 
-    
+    # Normalizar la señal
+    ri_norm = np.abs(ri) / a_max
+
+    # Evitar log(0): forzar un mínimo valor positivo
+    ri_norm_clipped = np.clip(ri_norm, 1e-10, None)
+
+    # Calcular en escala logarítmica
+    r = 20 * np.log10(ri_norm_clipped)
+
     return r
-
-"""audiodata, fs = sf.read("audios/ri_sintetizada.wav")
-señales_octava = filtros_norma_IEC61260(audiodata, fs, tipo_filtro='octava', orden_filtro=4)
-#sf.write("RI_125HZ.wav",señales_octava.get(125),fs)
-escala_log = escala_log(señales_octava.get(125))
-t = np.arange(len(escala_log)) / 44100
-graficar_dominio_temporal(t,escala_log)
-"""

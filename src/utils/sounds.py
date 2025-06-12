@@ -62,9 +62,11 @@ def ruidoRosa_voss_editado(t, fs=44100, ncols=16):
     
     return total
 
-def generar_sweep(duracion,fs=44100 ,f_inferior=20 ,f_superior=20000):
+def generar_sweep_inverse(duracion,fs=44100 ,f_inferior=20 ,f_superior=20000):
+
+    
     """
-    Genera un barrido logarítmico de frecuencias (sine sweep) entre f_inferior y f_superior.
+    Genera un barrido logarítmico de frecuencias (sine sweep) y un filtro inverso, entre f_inferior y f_superior.
 
     Parámetros
     ----------
@@ -81,6 +83,10 @@ def generar_sweep(duracion,fs=44100 ,f_inferior=20 ,f_superior=20000):
     -------
     sweep : np.ndarray
         Señal generada del barrido logarítmico normalizada.
+
+    inverse_sweep : np.ndarray
+        Señal generada del barrido logarítmico inverso normalizada.
+    
     fs : int
         Frecuencia de muestreo utilizada.
 
@@ -88,7 +94,7 @@ def generar_sweep(duracion,fs=44100 ,f_inferior=20 ,f_superior=20000):
     -------
     Generar un barrido logarítmico de frecuencias entre 20 Hz y 20000 Hz durante 10 segundos:
 
-        sweep, fs = generar_sweep(10)
+        sweep, inverse, fs = generar_sweep_inverse(10)
     """
     R = np.log(f_superior/f_inferior)
     muestras = int(duracion * fs)
@@ -98,62 +104,16 @@ def generar_sweep(duracion,fs=44100 ,f_inferior=20 ,f_superior=20000):
     #Generacion de vectores con numpy
     t = np.linspace(0, duracion, muestras, endpoint=False)
     sweep = np.sin(K * (np.exp(t/L) - 1 ))
+    #Generacion de vectores con numpy
+    m_t = f_inferior/((K/L) *(np.exp(t/L)))
+    m_t *= sweep[::-1]
+    inverse_sweep = m_t
 
     # Normalización, para evitar saturacion al reproducir
     sweep /= np.max(np.abs(sweep))
-
-    # Guardar el barrido en un archivo WAV
-    sf.write('./audios/sweep.wav', sweep, fs)
-
-    return sweep
-
-def generar_inverseSweep(duracion, fs=44100, f_inferior=20, f_superior=20000):
-    """
-    Genera un barrido logarítmico inverso de frecuencias (inverse sine sweep) entre f_inferior y f_superior.
-
-    Parámetros
-    ----------
-    duracion : float
-        Duración del barrido en segundos.
-    fs : int, opcional
-        Frecuencia de muestreo en Hz. Por defecto es 44100 Hz.
-    f_inferior : float, opcional
-        Frecuencia inferior del barrido en Hz. Por defecto es 20 Hz.
-    f_superior : float, opcional
-        Frecuencia superior del barrido en Hz. Por defecto es 20000 Hz.
-
-    Returns
-    -------
-    inverse_sweep : np.ndarray
-        Señal generada del barrido logarítmico inverso normalizada.
-    fs : int
-        Frecuencia de muestreo utilizada.
-
-    Ejemplo
-    -------
-    Generar un barrido logarítmico inverso de frecuencias entre 20 Hz y 20000 Hz durante 10 segundos:
-
-        inverse_sweep, fs = generar_inverseSweep(10)
-    """
-    
-    R = np.log(f_superior/f_inferior)
-    muestras = int(duracion * fs)
-    L = duracion/R
-    K = L * 2 * np.pi * f_inferior
-
-    #Generacion de vectores con numpy
-    t = np.linspace(0, duracion, muestras, endpoint=False)
-    m_t = np.exp(t/L)
-    x_t = np.sin(K * (np.exp(t/L) - 1 ))
-    inverse_sweep = m_t* x_t[::-1]
-
-    # Normalización, para evitar saturacion al reproducir
     inverse_sweep /= np.max(np.abs(inverse_sweep))
 
-    # Guardar el barrido en un archivo WAV
-    sf.write('./audios/inverse_sweep.wav', inverse_sweep, fs)
-
-    return inverse_sweep
+    return sweep, inverse_sweep, fs
 
 def grabar_reproducir(signal,fs=44100):
     """
