@@ -113,7 +113,9 @@ def generar_sweep_inverse(duracion,fs=44100 ,f_inferior=20 ,f_superior=20000):
     sweep /= np.max(np.abs(sweep))
     inverse_sweep /= np.max(np.abs(inverse_sweep))
 
-    return sweep, inverse_sweep, fs
+    return {'sweep_data': sweep,
+            'inverse_data': inverse_sweep,
+            'fs': fs} 
 
 def grabar_reproducir(signal,fs=44100):
     """

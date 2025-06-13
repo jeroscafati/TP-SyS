@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-
+import numpy as np
 def graficar_dominio_temporal(t, signal):
     """
     Grafica la señal en el dominio temporal.
@@ -36,7 +36,7 @@ def graficar_dominio_temporal(t, signal):
     plt.show()
     return None
 
-def graficar_espectro(x, fs):
+def graficar_espectro(x, fs,color='r'):
     """
     Calcula el espectro de la señal x (longitud N, muestreo fs) y lo grafica
     con eje X en escala logarítmica y eje Y en dB.
@@ -62,13 +62,13 @@ def graficar_espectro(x, fs):
     plt.xscale('log')
 
     # 3.b) Graficar espectro en dB vs frecuencia
-    plt.plot(f, YdB, linewidth=1.5, color='blue')
-    ax.fill_between(f, YdB, y2=ax.get_ylim()[0], color=line_color, alpha=0.3)
+    plt.plot(f, YdB, linewidth=1.5, color=color)
+    #plt.fill_between(f, YdB, y2=ax.get_ylim()[0], color=line_color, alpha=0.3)
     plt.grid(True, which='both', ls='--', alpha=0.5)
 
     # 4) Definir límites del eje X (no puede empezar en 0 si es log)
     plt.xlim(20, fs/2)  # por ejemplo de 20 Hz hasta fs/2
-
+    plt.ylim(-80, 0)  # límites en dB, ajusta según tu señal
     # 5) Poner ticks “personalizados” en frecuencias de interés
     freqs_ticks = [20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000]
     plt.xticks(freqs_ticks, [str(int(f)) for f in freqs_ticks])

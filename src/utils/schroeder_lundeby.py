@@ -1,7 +1,5 @@
 import numpy as np
-from linear_fit import regresion_lineal
-from utils.generar_ri import escala_log
-from suavizado import filtro_promedio_movil
+
 
 def metodo_lundeby(ir,fs,
                    win_ms=50,

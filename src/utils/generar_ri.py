@@ -1,46 +1,54 @@
 import soundfile as sf
 import numpy as np
 from scipy import signal
+from config import get_output_filepath
+import matplotlib.pyplot as plt
 
+def sintetizar_RI(frecuencias: dict,
+                  fs: int = 44100,
+                  piso_ruido_db: float = -60.0,
+                  delay_s: float = 0.5):
 
-def ri_sintetizada(frecuencias: dict,fs=44100):
-    """
-    Genera una respuesta al impulso sintetizada a partir de un diccionario
-    de frecuencias centrales y sus respectivos (T60, Amplitud).
-
-    Parámetros
-    ----------
-    frecuencias : dict
-        Clave = frecuencia central (Hz).
-        Valor = tupla (T60_en_segundos, Amplitud).
-    fs : int
-        Frecuencia de muestreo (por defecto 44100 Hz).
-
-    Retorna
-    -------
-    ri_sintetizada : ndarray (1D)
-        Vector con las muestras de la RI normalizada en [-1, 1].
-    """
-    # Definimos duracion de RI 20% mayor a T60 por banda mas grande
+    # 1.Duración RI
+    #  20% más que el T60 máximo
     t60max = max(v[0] for v in frecuencias.values())
-    segundos = 1.2 * t60max
-    # Crear un vector de tiempo para la RI sintetizada
+    segundos = (1.2 * t60max)
     t = np.arange(0, segundos, 1/fs)  
     
-    # Inicializar la RI sintetizada
-    ri_sintetizada = np.zeros_like(t)
+    # 2.Sintetizar RI
+    ri = np.zeros_like(t)
     factor = 3 * np.log(10)
 
     for freq, (t60, A) in frecuencias.items():
         tau_i = factor/ t60
-        ri_sintetizada += A* np.exp(-tau_i * t) * np.cos(2 * np.pi * freq * t)
+        ri += A* np.exp(-tau_i * t) * np.cos(2 * np.pi * freq * t)
        
-    ri_sintetizada /= np.max(np.abs(ri_sintetizada))
-    ri_int16 = (ri_sintetizada * 32767).astype(np.int16)
-    sf.write('./audios/ri_sintetizada.wav', ri_int16, fs)
-    return ri_sintetizada
+    # 3.Añadir ruido blanco
+    rms_ruido = 10 ** (piso_ruido_db / 20)
+    ruido = rms_ruido * np.random.randn(len(t))
 
-def ri_sweep(grabacion, filtro_inverso,filename="RI_sweep.wav",fs=44100):
+    #4. Sumar RI y Ruido
+    ri_ruido = ri + ruido
+
+    #5 Retrasar RI
+    delay = rms_ruido * np.random.rand(int(delay_s * fs))
+    ri_ruido = np.concatenate((delay, ri_ruido))
+
+    #6 Normalizar RI
+    ri_ruido /= np.max(np.abs(ri_ruido))
+    
+    #7 Exportar RI
+    #Ruta del archivo
+    out_file = get_output_filepath('ri_sintetizada.wav')
+    
+    # Guardar la señal sintetizada como un archivo WAV
+    ri_int16 = (ri_ruido * 32767).astype(np.int16)
+    sf.write(str(out_file), ri_int16, fs)
+
+    return {'audio_data':ri_ruido,
+            'fs':fs}
+
+def obtener_RI_por_deconvolucion(grabacion, filtro_inverso,filename="RI_sweep.wav",fs=44100):
     """
     Devuelve la respuesta al impulso h[n] = (grabacion * filtro_inverso) en el dominio del tiempo,
     usando multiplicación de espectros (FFT).
@@ -60,27 +68,32 @@ def ri_sweep(grabacion, filtro_inverso,filename="RI_sweep.wav",fs=44100):
         Es un array real (dtype float) con la RI normalizada
 
     """
-    # Longitud que debería tener la convolución lineal:
+    # 1. Longitud que debería tener la convolución lineal:
     N_lineal = len(grabacion) + len(filtro_inverso) - 1
     
-    # Elegimos N_FFT como la siguiente potencia de 2 mayor a N_lineal (por eficiencia).
+    # 2. Elegimos N_FFT como la siguiente potencia de 2 mayor a N_lineal (por eficiencia).
     
     N_FFT = 1 << int(np.ceil(np.log2(N_lineal)))
     
-    # FFT de ambas señales completando el tamaño a N_FFT 
+    #3. FFT de ambas señales completando el tamaño a N_FFT 
     FFT_grab = np.fft.fft(grabacion,      n=N_FFT)
     FFT_filt = np.fft.fft(filtro_inverso, n=N_FFT)
     
     RI = np.real(np.fft.ifft(FFT_grab * FFT_filt))
     RI = RI[:N_lineal]
     
-    # Normalizar la respuesta al impulso
+    #4. Normalizar la respuesta al impulso
     RI /= np.max(np.abs(RI))
     
-    # Exportamos como wav
-    sf.write(filename,RI, fs)
+    #5 Convertir a PCM16 para exportar
+    ri_int16 = (RI * 32767).astype(np.int16)
+    out_file = get_output_filepath(filename)
 
-    return RI
+    #6. Exportamos como wav
+    sf.write(str(out_file), ri_int16, fs)
+
+    return {'audio_data': RI,
+             'fs': fs}
 
 def filtrar_signal(audiodata, fs, tipo_filtro='octava', orden_filtro=4):
     """
@@ -100,7 +113,7 @@ def filtrar_signal(audiodata, fs, tipo_filtro='octava', orden_filtro=4):
     if tipo_filtro == 'octava':
         G = 1.0 / 2.0
         # Frecuencias centrales de octava
-        frecuencias_centrales = [31.5, 63, 125, 250, 500, 1000, 2000, 4000, 8000]
+        frecuencias_centrales = [31.5, 63, 125, 250, 500, 1000, 2000, 4000, 8000,16000]
     elif tipo_filtro == 'tercio_octava':
         G = 1.0 / 6.0
         # Frecuencias centrales de tercio de octava
@@ -111,16 +124,25 @@ def filtrar_signal(audiodata, fs, tipo_filtro='octava', orden_filtro=4):
         raise ValueError("El tipo_filtro debe ser 'octava' o 'tercio_octava'")
 
     factor = np.power(2, G)
+    nyquist = fs / 2.0
     señales_filtradas = {}
 
-    print(f"Filtrando con filtros de {tipo_filtro}s (Orden: {orden_filtro})...")
 
     for centerFrequency_Hz in frecuencias_centrales:
         lowerCutoffFrequency_Hz = centerFrequency_Hz / factor
         upperCutoffFrequency_Hz = centerFrequency_Hz * factor
 
+        # Recorte al rango (eps, nyquist*0.999)
+        eps = 1e-6
+        low_clipped = max(lowerCutoffFrequency_Hz, eps)
+        high_clipped = min(upperCutoffFrequency_Hz, nyquist * 0.999)
+
+        if low_clipped >= high_clipped:
+            continue
+
+
         sos = signal.iirfilter(orden_filtro,
-                               [lowerCutoffFrequency_Hz, upperCutoffFrequency_Hz],
+                               [low_clipped, high_clipped],
                                rs=60,
                                btype='band',
                                analog=False,
@@ -129,31 +151,32 @@ def filtrar_signal(audiodata, fs, tipo_filtro='octava', orden_filtro=4):
                                output='sos')
 
         # Aplicando el filtro al audio
-        filt_signal = signal.sosfilt(sos, audiodata)
+        filt_signal = signal.sosfiltfilt(sos, audiodata)
         señales_filtradas[centerFrequency_Hz] = filt_signal
-        print(f"  Filtrada banda de {centerFrequency_Hz} Hz (cortes: {lowerCutoffFrequency_Hz:.2f}-{upperCutoffFrequency_Hz:.2f} Hz)")
-
+        
     return señales_filtradas
 
-def escala_log(ri):
+def escala_log(signal):
     """
-    Convierte la respuesta al impulso (ri) a escala logarítmica normalizada.
+    Convierte la respuesta al impulso (signal) a escala logarítmica normalizada.
 
     Parámetros:
-    ri (numpy array): señal de respuesta al impulso
+    signal (numpy array): señal de respuesta al impulso
 
     Retorna:
     - r (numpy array): señal transformada a escala logarítmica
     """
-    a_max = np.max(np.abs(ri))
+    a_max = np.max(np.abs(signal))
 
     # Normalizar la señal
-    ri_norm = np.abs(ri) / a_max
+    signal_norm = np.abs(signal) / a_max
 
     # Evitar log(0): forzar un mínimo valor positivo
-    ri_norm_clipped = np.clip(ri_norm, 1e-10, None)
+    signal_norm_clipped = np.clip(signal_norm, 1e-10, None)
 
     # Calcular en escala logarítmica
-    r = 20 * np.log10(ri_norm_clipped)
+    log_signal = 10 * np.log10(signal_norm_clipped)
 
-    return r
+    return log_signal
+
+
