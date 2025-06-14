@@ -23,46 +23,7 @@ def metodo_lundeby(ir,fs,
     times = np.arange(0, n, step) / fs
     # escala dB normalizada
     env_db = escala_log(rms)
-    # --- Paso 2: estimación inicial de ruido -----------------------------
-    idx0 = int(0.9 * len(env_db))
-    noise_db = np.mean(env_db[idx0:])
-
-    # --- Paso 3 y 4: pendiente inicial y cruce ----------------------------
-    fit_lo = noise_db + initial_excess_db
-    fit_hi = 0
-    mask = (env_db <= fit_hi) & (env_db >= fit_lo)
-    slope, intercept, *_ = linregress(times[mask], env_db[mask])
-    t_c = (noise_db - intercept) / slope
-
-    # --- Pasos 5-10: refinamiento iterativo ------------------------------
-    for _ in range(max_iters):
-        prev_t = t_c
-        # Paso 5: dividir decaimiento en intervalos locales
-        total_decay = 0 - noise_db
-        n_int = max(int(intervals_per_10db * (total_decay / 10)), 1)
-        db_bins = np.linspace(0, noise_db, n_int + 1)
-        interval_times = (db_bins - intercept) / slope
-        # (Paso 6: opcional recalcular RMS por intervalo)
-        # Paso 7: refinar ruido desde cruce+exceso
-        thr_db = noise_db + refine_excess_db
-        idx = np.where(env_db <= thr_db)[0]
-        if idx.size == 0:
-            break
-        noise_db = np.mean(env_db[idx[0]:idx[0] + int(noise_tail_frac*len(env_db))])
-        # Paso 8: re-ajustar pendiente en rango refinado
-        fit_lo = noise_db + refine_excess_db
-        fit_hi = noise_db + refine_range_db[1]
-        mask = (env_db <= fit_hi) & (env_db >= fit_lo)
-        if mask.sum() < 2:
-            break
-        slope, intercept, *_ = linregress(times[mask], env_db[mask])
-        # Paso 9: nuevo cruce
-        t_c = (noise_db - intercept) / slope
-        # Paso 10: convergencia
-        if abs(t_c - prev_t) * 1e3 < conv_thresh_ms:
-            break
-
-    return max(0.0, t_c)
+    #faltamucho...
 
 
 

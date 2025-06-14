@@ -8,7 +8,48 @@ def sintetizar_RI(frecuencias: dict,
                   fs: int = 44100,
                   piso_ruido_db: float = -60.0,
                   delay_s: float = 0.5):
+    """
+    Sintetiza una respuesta al impulso (RI) multibanda con ruido y la guarda como WAV.
 
+    La RI sintetizada se construye como la suma de decaimientos exponenciales modulados
+    en frecuencia para cada banda, con adición de ruido blanco, un retraso inicial aleatorio,
+    y normalización al valor máximo.
+
+    Parámetros:
+    -----------
+    frecuencias : dict
+        Diccionario donde cada clave es la frecuencia central (Hz) y cada valor es una tupla
+        (T60, A) con:
+            - T60 (float): tiempo de reverberación (s) para esa frecuencia.
+            - A   (float): amplitud inicial de la banda.
+    fs : int, opcional
+        Frecuencia de muestreo en Hz. Por defecto 44100.
+    piso_ruido_db : float, opcional
+        Nivel RMS del ruido blanco en dBFS (referido a la amplitud máxima = 0 dBFS).
+        Por defecto -60 dB.
+    delay_s : float, opcional
+        Duración del retraso inicial agregado en segundos (antes de la RI).
+        Por defecto 0.5 s.
+
+    Retorna:
+    --------
+    dict:
+        'audio_data' (np.ndarray): señal sintetizada con forma (n_samples,) y valores en [-1,1].
+        'fs'         (int)      : frecuencia de muestreo retornada.
+
+    Efectos secundarios:
+    ---------------------
+    - Guarda un archivo WAV llamado 'ri_sintetizada.wav' en la ruta especificada
+      por get_output_filepath().
+
+    Ejemplo de uso:
+    ---------------
+    >>> freqs = {125: (2.8,1.0), 250:(2.2,1.0), 500:(1.8,1.0)}
+    >>> resultado = sintetizar_RI(freqs, fs=48000, piso_ruido_db=-50, delay_s=0.2)
+    >>> audio = resultado['audio_data']
+    >>> print(audio.shape, resultado['fs'])  # (n_samples,)
+    """
+    
     # 1.Duración RI
     #  20% más que el T60 máximo
     t60max = max(v[0] for v in frecuencias.values())
@@ -113,18 +154,17 @@ def filtrar_signal(audiodata, fs, tipo_filtro='octava', orden_filtro=4):
     if tipo_filtro == 'octava':
         G = 1.0 / 2.0
         # Frecuencias centrales de octava
-        frecuencias_centrales = [31.5, 63, 125, 250, 500, 1000, 2000, 4000, 8000,16000]
+        frecuencias_centrales = [125, 250, 500, 1000, 2000, 4000, 8000]
     elif tipo_filtro == 'tercio_octava':
         G = 1.0 / 6.0
         # Frecuencias centrales de tercio de octava
-        frecuencias_centrales = [25, 31.5, 40, 50, 63, 80, 100, 125, 160, 200, 250,
+        frecuencias_centrales = [125, 160, 200, 250,
                                  315, 400, 500, 630, 800, 1000, 1250, 1600, 2000,
-                                 2500, 3150, 4000, 5000, 6300, 8000, 10000, 12500, 16000, 20000]
+                                 2500, 3150, 4000, 5000, 6300, 8000]
     else:
         raise ValueError("El tipo_filtro debe ser 'octava' o 'tercio_octava'")
 
     factor = np.power(2, G)
-    nyquist = fs / 2.0
     señales_filtradas = {}
 
 
@@ -132,17 +172,8 @@ def filtrar_signal(audiodata, fs, tipo_filtro='octava', orden_filtro=4):
         lowerCutoffFrequency_Hz = centerFrequency_Hz / factor
         upperCutoffFrequency_Hz = centerFrequency_Hz * factor
 
-        # Recorte al rango (eps, nyquist*0.999)
-        eps = 1e-6
-        low_clipped = max(lowerCutoffFrequency_Hz, eps)
-        high_clipped = min(upperCutoffFrequency_Hz, nyquist * 0.999)
-
-        if low_clipped >= high_clipped:
-            continue
-
-
         sos = signal.iirfilter(orden_filtro,
-                               [low_clipped, high_clipped],
+                               [lowerCutoffFrequency_Hz, upperCutoffFrequency_Hz],
                                rs=60,
                                btype='band',
                                analog=False,
@@ -158,13 +189,13 @@ def filtrar_signal(audiodata, fs, tipo_filtro='octava', orden_filtro=4):
 
 def escala_log(signal):
     """
-    Convierte la respuesta al impulso (signal) a escala logarítmica normalizada.
+    Convierte un array a escala logarítmica normalizada.
 
     Parámetros:
-    signal (numpy array): señal de respuesta al impulso
+    signal (numpy array): por ejemplo, señal de respuesta al impulso
 
     Retorna:
-    - r (numpy array): señal transformada a escala logarítmica
+    - signal_db (numpy array): señal convertida a escala logarítmica
     """
     a_max = np.max(np.abs(signal))
 
@@ -175,8 +206,8 @@ def escala_log(signal):
     signal_norm_clipped = np.clip(signal_norm, 1e-10, None)
 
     # Calcular en escala logarítmica
-    log_signal = 10 * np.log10(signal_norm_clipped)
+    signal_db = 10 * np.log10(signal_norm_clipped)
 
-    return log_signal
+    return signal_db
 
 

@@ -1,4 +1,5 @@
 import numpy as np
+
 def hilbert_transform(s_t):
     """
     Suaviza una señal obteniendo su envolvente a través de una implementación
@@ -35,6 +36,7 @@ def hilbert_transform(s_t):
     envolvente = np.abs(analitica)
 
     return envolvente
+
 def filtro_promedio_movil(x, L):
     """
     Aplica un filtro de promedio móvil de longitud L a una señal x.
@@ -44,12 +46,12 @@ def filtro_promedio_movil(x, L):
     x : ndarray
         Señal de entrada (1D, array de valores reales o complejos).
     L : int
-        Longitud de la ventana de promedio.
+        Longitud (muestras) de la ventana de promedio.
     
     Retorna:
     --------
     y : ndarray
-        Señal filtrada (promediada).
+        Señal suavizada.
     """
     if L < 1:
         raise ValueError("La longitud L debe ser mayor o igual a 1")
@@ -61,54 +63,24 @@ def filtro_promedio_movil(x, L):
     y = np.convolve(x, kernel, mode='same')  
     return y
 
-# Ejemplo de uso:
-if __name__ == "__main__":
-    import soundfile as sf
-    # señal de prueba
-    x1, fs = sf.read("audios/s1r2.wav")
-    #mono
-    x = x1[:,0]
-    t = np.arange(len(x)) / fs
-
-    L = 5
-    
-    hilbert = hilbert_transform(x)
-    media_movil = filtro_promedio_movil(x,L)
-    print(f"longitud original: {len(x)}\n Longitud media_movil: {len(media_movil)}\n Longitud hilbert: {len(hilbert)}")
-    import matplotlib.pyplot as plt
-    fig, axs = plt.subplots(2, 1, figsize=(8, 6), sharex=True)
-
-    # Subplot 0: original vs. media móvil
-    axs[0].plot(t, x, label="original")
-    axs[0].plot(t, media_movil, label="media_movil")
-    axs[0].set_ylabel("Amplitud")
-    axs[0].legend()
-    axs[0].set_title("Original y Promedio Móvil")
-
-    # Subplot 1: original vs. hilbert
-    axs[1].plot(t, x, label="original")
-    axs[1].plot(t, hilbert, label="hilbert")
-    axs[1].set_xlabel("Tiempo [s]")
-    axs[1].set_ylabel("Amplitud")
-    axs[1].legend()
-    axs[1].set_title("Original y Transformada de Hilbert")
-
-    plt.tight_layout()
-    plt.show()
+def array_multicanal_a_1d(array):
     """
-    # Señal de prueba: seno modulada
-    t = np.linspace(0, 1, 500, endpoint=False)
-    carrier = np.sin(2*np.pi*50*t)
-    modulator = 1 + 0.5*np.sin(2*np.pi*3*t)
-    x = carrier * modulator
+    Colapsa un array de forma (m, n) a (m,) reduciendo las columnas.
 
-    env = hilbert_transform(x)
+    Parámetros:
+    -----------
+    x : ndarray, forma (m, n)
+        Array de entrada.
 
-    plt.figure()
-    plt.plot(t, x, label='Señal')
-    plt.plot(t, env, label='Envolvente', linewidth=2)
-    plt.legend()
-    plt.xlabel('Tiempo [s]')
-    plt.show()
+    Retorna:
+    --------
+    y : ndarray, forma (1, n)
+        Array con una sola fila, promediada de cada columna.
     """
-
+    if array.ndim == 1:
+        y = array
+    elif array.shape[1] == 1:
+        y = np.squeeze(array)
+    else:
+        y = np.mean(array, axis=1)
+    return y
