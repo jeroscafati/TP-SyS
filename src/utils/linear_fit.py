@@ -80,6 +80,12 @@ def calcular_parametros_acusticos(signal_db, fs):
     m_t30 = regresion_lineal_en_intervalo(t, signal_db_norm,  -5, -35)
     t60_from_t30 = -60.0 / m_t30['slope']
 
+    # 5) D50:
+
+
+    # 6) C80:
+
+    
     return {
         'EDT': edt,
         'T60_from_T10': t60_from_t10,
