@@ -1,7 +1,7 @@
 from utils.linear_fit_y_db_scale import escala_log
 from utils.suavizado_y_filtros import filtro_promedio_movil, hilbert_transform, filtrar_signal
 from utils.schroeder_lundeby import integral_schroeder, lundeby
-from utils.param_acusticos import calcular_parametros_acusticos
+from 3era_entrega.utils.param_acusticos import calcular_parametros_acusticos
 
 def obtener_parametros_de_RI(ri,fs,banda='octava',ventana_suavizado_ms=5,debug_mode = False):
     """
