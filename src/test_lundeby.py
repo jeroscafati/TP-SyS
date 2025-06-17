@@ -1,7 +1,7 @@
-from utils.obtener_sintetizar_ri import sintetizar_RI
+from utils.segunda_entrega.obtener_sintetizar_ri import sintetizar_RI
 import numpy as np
 import matplotlib.pyplot as plt
-from utils.schroeder_lundeby import lundeby
+from utils.tercer_entrega.schroeder_lundeby import lundeby
 
 
 def test_lundeby(freq_t60, piso_ruido_db):

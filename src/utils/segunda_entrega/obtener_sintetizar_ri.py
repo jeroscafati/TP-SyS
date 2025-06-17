@@ -1,6 +1,6 @@
 import soundfile as sf
 import numpy as np
-from utils.otras_func import get_output_filepath
+from utils.tercer_entrega.otras_func import get_output_filepath
 
 def sintetizar_RI(frecuencias: dict,
                   fs: int = 44100,
@@ -78,7 +78,7 @@ def sintetizar_RI(frecuencias: dict,
     
     #7 Exportar RI
     #Ruta del archivo
-    out_file = get_output_filepath('ri_sintetizada.wav')
+    out_file = get_output_filepath('ri_sintetizada.wav',levels_up=3)
     
     # Guardar la señal sintetizada como un archivo WAV
     ri_int16 = (ri_ruido * 32767).astype(np.int16)
@@ -126,7 +126,7 @@ def obtener_RI_por_deconvolucion(grabacion, filtro_inverso,filename="RI_sweep.wa
     
     #5 Convertir a PCM16 para exportar
     ri_int16 = (RI * 32767).astype(np.int16)
-    out_file = get_output_filepath(filename)
+    out_file = get_output_filepath(filename,levels_up=3)
 
     #6. Exportamos como wav
     sf.write(str(out_file), ri_int16, fs)

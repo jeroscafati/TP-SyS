@@ -1,5 +1,5 @@
 import numpy as np
-from utils.linear_fit_y_db_scale import regresion_lineal_en_intervalo, escala_log
+from utils.tercer_entrega.linear_fit_y_db_scale import regresion_lineal_en_intervalo, escala_log
 
 def calcular_rms_por_bloques(ir, fs, ms_bloque=20):
     """

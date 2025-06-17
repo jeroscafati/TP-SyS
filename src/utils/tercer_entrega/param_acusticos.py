@@ -1,5 +1,5 @@
 import numpy as np
-from utils.linear_fit_y_db_scale import regresion_lineal_en_intervalo
+from utils.tercer_entrega.linear_fit_y_db_scale import regresion_lineal_en_intervalo
 
 def calcular_D50_C80(p2: np.ndarray, fs: int) -> dict:
     """
