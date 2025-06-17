@@ -1,8 +1,6 @@
 import soundfile as sf
 import numpy as np
-from scipy import signal
-from config import get_output_filepath
-import matplotlib.pyplot as plt
+from utils.otras_func import get_output_filepath
 
 def sintetizar_RI(frecuencias: dict,
                   fs: int = 44100,
@@ -136,78 +134,5 @@ def obtener_RI_por_deconvolucion(grabacion, filtro_inverso,filename="RI_sweep.wa
     return {'audio_data': RI,
              'fs': fs}
 
-def filtrar_signal(audiodata, fs, tipo_filtro='octava', orden_filtro=4):
-    """
-    Filtra una señal de audio en bandas de octava o tercio de octava según la norma IEC 61260.
-
-    Args:
-        audiodata (np.array): La señal de audio a filtrar.
-        fs (int): Frecuencia de muestreo de la señal de audio (Hz).
-        tipo_filtro (str): 'octava' para filtros de octava, 'tercio_octava' para tercios de octava.
-        orden_filtro (int): El grado del filtro IIR.
-
-    Returns:
-        dict: Un diccionario donde las claves son las frecuencias centrales (Hz)
-              y los valores son las señales de audio filtradas para esa banda.
-    """
-
-    if tipo_filtro == 'octava':
-        G = 1.0 / 2.0
-        # Frecuencias centrales de octava
-        frecuencias_centrales = [125, 250, 500, 1000, 2000, 4000, 8000]
-    elif tipo_filtro == 'tercio_octava':
-        G = 1.0 / 6.0
-        # Frecuencias centrales de tercio de octava
-        frecuencias_centrales = [125, 160, 200, 250,
-                                 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000,
-                                 2500, 3150, 4000, 5000, 6300, 8000]
-    else:
-        raise ValueError("El tipo_filtro debe ser 'octava' o 'tercio_octava'")
-
-    factor = np.power(2, G)
-    señales_filtradas = {}
-
-
-    for centerFrequency_Hz in frecuencias_centrales:
-        lowerCutoffFrequency_Hz = centerFrequency_Hz / factor
-        upperCutoffFrequency_Hz = centerFrequency_Hz * factor
-
-        sos = signal.iirfilter(orden_filtro,
-                               [lowerCutoffFrequency_Hz, upperCutoffFrequency_Hz],
-                               rs=60,
-                               btype='band',
-                               analog=False,
-                               ftype='butter', 
-                               fs=fs,
-                               output='sos')
-
-        # Aplicando el filtro al audio
-        filt_signal = signal.sosfiltfilt(sos, audiodata)
-        señales_filtradas[centerFrequency_Hz] = filt_signal
-        
-    return señales_filtradas
-
-def escala_log(signal):
-    """
-    Convierte un array a escala logarítmica normalizada.
-
-    Parámetros:
-    signal (numpy array): por ejemplo, señal de respuesta al impulso
-
-    Retorna:
-    - signal_db (numpy array): señal convertida a escala logarítmica
-    """
-    a_max = np.max(np.abs(signal))
-
-    # Normalizar la señal
-    signal_norm = np.abs(signal) / a_max
-
-    # Evitar log(0): forzar un mínimo valor positivo
-    signal_norm_clipped = np.clip(signal_norm, 1e-10, None)
-
-    # Calcular en escala logarítmica
-    signal_db = 10 * np.log10(signal_norm_clipped)
-
-    return signal_db
 
 

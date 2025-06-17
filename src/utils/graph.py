@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+
 def graficar_dominio_temporal(t, signal):
     """
     Grafica la señal en el dominio temporal.

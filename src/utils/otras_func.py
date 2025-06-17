@@ -1,4 +1,5 @@
 from pathlib import Path
+import numpy as np
 
 def get_output_filepath(filename: str,
                         levels_up: int = 2,
@@ -41,3 +42,25 @@ def get_output_filepath(filename: str,
     out_dir.mkdir(parents=True, exist_ok=True)
 
     return out_file
+
+def array_multicanal_a_1d(array):
+    """
+    Colapsa un array de forma (m, n) a (m,) reduciendo las columnas.
+
+    Parámetros:
+    -----------
+    x : ndarray, forma (m, n)
+        Array de entrada.
+
+    Retorna:
+    --------
+    y : ndarray, forma (1, n)
+        Array con una sola fila, promediada de cada columna.
+    """
+    if array.ndim == 1:
+        y = array
+    elif array.shape[1] == 1:
+        y = np.squeeze(array)
+    else:
+        y = np.mean(array, axis=1)
+    return y
