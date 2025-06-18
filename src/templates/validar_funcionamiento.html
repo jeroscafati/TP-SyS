@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% import 'macros/macro.html' as macro %}
+
+{% block title %}Validar{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h1>Sintetizar RI</h1>
+            <hr>
+            <p>Debemos validar el funcionamiento del
+                 software. Para ello debemos <strong>sintetizar una respuesta al impulso (RI)</strong>
+                con parámetros conocidos y analizarla.
+            </p>
+            <form id="sintetizarRI">
+                <h4>Parámetros de la respuesta al impulso</h4>
+                <div class="mb-3 row justify-content-center">
+                    <div class="col-md-6">
+                        <h5>Piso de ruido (dB)</h5>
+                        <input type="number" class="form-control" id="ruido_piso_db" name="ruido_piso_db" value="-50">
+                    </div> 
+                </div>
+                {% for freq in frecuencias %}
+                {{ macro.frequency_input(freq) }}
+                {% endfor %}
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                    <button type="button" onclick="enviarFormulario()" class="btn btn-primary">Analizar RI sintética</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div id="resultados" class="mt-4" style="display: none;">
+    <h3>Resultados del Análisis</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped" id="tablaResultados">
+            <thead class="table-dark">
+                <tr id="encabezadosFrecuencias">
+                    <!-- Frequencies will be added here as column headers -->
+                </tr>
+            </thead>
+            <tbody id="cuerpoTabla">
+                <!-- Parameter rows will be added here -->
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+function enviarFormulario() {
+    const form = document.getElementById('sintetizarRI');
+    const formData = new FormData(form);
+    
+    // Get the form values
+    const ruidoPisoDb = parseFloat(form.querySelector('#ruido_piso_db').value);
+    
+    // Prepare the data object with all required fields
+    const datos = {
+        ruido_piso_db: ruidoPisoDb,
+        frecuencias: {}
+    };
+    
+    // Get all frequency inputs and group them by frequency
+    const t60Inputs = form.querySelectorAll('[name^="t60_"]');
+    t60Inputs.forEach(input => {
+        const freq = input.name.split('_')[1];
+        const t60 = parseFloat(input.value);
+        const ampInput = form.querySelector(`[name="amp_${freq}"]`);
+        const amp = parseFloat(ampInput.value);
+        datos.frecuencias[freq] = [t60, amp];
+    });
+    
+    console.log('Enviando datos:', datos);
+    
+    // Show loading state
+    const submitBtn = form.querySelector('button[type="button"]');
+    const originalBtnText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando...';
+    
+    fetch("{{ url_for('validar_funcionamiento') }}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(datos)
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => { throw new Error(text) });
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Success:', data);
+        mostrarResultados(data.data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al procesar la solicitud: ' + error.message);
+    })
+    .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnText;
+    });
+}
+
+function mostrarResultados(data) {
+    const resultadosDiv = document.getElementById('resultados');
+    const encabezadosFrecuencias = document.getElementById('encabezadosFrecuencias');
+    const cuerpoTabla = document.getElementById('cuerpoTabla');
+    
+    // Clear previous results
+    encabezadosFrecuencias.innerHTML = '<th>Frecuencia (Hz)</th>';
+    cuerpoTabla.innerHTML = '';
+    
+    // Get all parameter names (EDT, T20, etc.)
+    const parametros = Object.keys(data);
+    
+    // Add parameter headers
+    parametros.forEach(param => {
+        encabezadosFrecuencias.innerHTML += `<th>${param}</th>`;
+    });
+    
+    // Get all frequencies from the first parameter
+    const frecuencias = Object.keys(data[parametros[0]]);
+    
+    // Add a row for each frequency
+    frecuencias.forEach(freq => {
+        const fila = document.createElement('tr');
+        fila.innerHTML = `<td><strong>${freq}</strong></td>`;
+        
+        // Add values for each parameter
+        parametros.forEach(param => {
+            const valor = data[param][freq];
+            // Format numbers to 2 decimal places if they're numbers
+            const valorFormateado = typeof valor === 'number' ? valor.toFixed(2) : valor;
+            fila.innerHTML += `<td>${valorFormateado}</td>`;
+        });
+        
+        cuerpoTabla.appendChild(fila);
+    });
+    
+    // Show results section
+    resultadosDiv.style.display = 'block';
+    
+    // Scroll to results
+    resultadosDiv.scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+{% endblock %}
