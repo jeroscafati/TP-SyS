@@ -1,20 +1,64 @@
 {% extends 'base.html' %}
 {% block body %}
-<h3>Generar Sine Sweep y filtro inverso</h3>
-<section id="formulario">
-  <form action="{{ url_for('generar') }}" method="post" enctype="multipart/form-data">
-    <label>Duración (s):
-      <input type="number" step="0.1" name="duracion" required>
-    </label>
-    <label>Freq. inferior (Hz):
-      <input type="number" step="1" name="f_inferior" placeholder="20" required>
-    </label>
-    <label>Freq. superior (Hz):
-      <input type="number" step="1" name="f_superior" placeholder="20000" required>
-    </label><br><br>
-    <button type="submit">Generar Sweep</button>
-  </form><br><br>
-    
-</section>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header fondo-azul text-white">
+                    <h4 class="mb-0"><i class="bi bi-soundwave me-2"></i>Generador de Señales</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Genere señales de prueba personalizadas para su análisis acústico.
+                    </div>
+                    
+                    <form action="{{ url_for('generar') }}" method="post" enctype="multipart/form-data" class="mt-4">
+                        <h5 class="mb-3">Configuración del Sine Sweep</h5>
+                        
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <label for="duracion" class="form-label">Duración</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="duracion" name="duracion" 
+                                           step="0.1" min="0.1" max="30" value="5" required>
+                                    <span class="input-group-text">segundos</span>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="f_inferior" class="form-label">Frecuencia mínima</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="f_inferior" name="f_inferior" 
+                                           step="1" min="20" max="20000" value="20" required>
+                                    <span class="input-group-text">Hz</span>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label for="f_superior" class="form-label">Frecuencia máxima</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="f_superior" name="f_superior" 
+                                           step="1" min="21" max="24000" value="20000" required>
+                                    <span class="input-group-text">Hz</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="bi bi-play-fill me-2 fondo-azul"></i>Generar Señales
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="alert alert-light mt-4" role="alert">
+                <i class="bi bi-lightbulb text-warning me-2"></i>
+                <strong>Consejo:</strong> Para mediciones de respuesta al impulso, se recomienda usar un barrido de al menos 10 segundos.
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}

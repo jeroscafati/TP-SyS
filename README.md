@@ -1,5 +1,5 @@
 # Trabajo Práctico - Desarrollo de software para el cálculo de parámetros acústicos ISO 3382
-
+![Logo](/src/static/img/preview.png)
 ##  Descripción
 Sistema integral para el análisis acústico de espacios arquitectónicos mediante el cálculo de parámetros acústicos según la normativa ISO 3382 (UNE-EN ISO 3382, 2010). La aplicación permite la generación, medición y análisis de respuestas al impulso en entornos acústicos.
 
@@ -14,8 +14,8 @@ Sistema integral para el análisis acústico de espacios arquitectónicos median
 
 1. Clonar el repositorio:
    ```bash
-   git clone https://github.com/tu-usuario/tu-proyecto.git
-   cd tu-proyecto
+   git clone https://github.com/jeroscafati/TP-SyS.git
+   cd TP-SyS
    ```
 
 2. Crear y activar entorno virtual (recomendado):

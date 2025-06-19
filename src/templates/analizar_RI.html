@@ -1,12 +1,41 @@
 {% extends 'base.html' %}
 {% block body %}
-  <h3>Subir archivo wav</h3><br>
-  <form method="post" action="{{url_for('file_upload')}}" enctype="multipart/form-data">
-    <input type="file" id="file" name="file" accept=".wav, audio/wav">
-    <button type="button" onclick="uploadFile()" class="btn btn-primary">Cargar Archivo</button>
-  </form><br><br>
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="card shadow-sm">
+          <div class="card-header fondo-azul">
+            <h4 class="mb-0"><i class="bi bi-upload me-2"></i>Analizador de Respuesta al Impulso</h4>
+          </div>
+          <div class="card-body text-center p-5">
+            <div class="mb-4">
+              <i class="bi bi-file-earmark-music display-1 text-primary mb-3"></i>
+              <h3>Sube tu archivo de audio</h3>
+              <p class="text-muted">Selecciona un archivo .wav para analizar la respuesta al impulso</p>
+            </div>
+            
+            <form method="post" action="{{url_for('file_upload')}}" enctype="multipart/form-data" class="mb-4">
+              <div class="input-group mb-3">
+                <input type="file" id="file" name="file" accept=".wav, audio/wav" class="form-control">
+                <button type="button" onclick="uploadFile()" class="btn btn-primary fondo-azul">
+                  Cargar Archivo
+                </button>
+              </div>
+              <div class="text-muted small">
+                <i class="bi bi-info-circle"></i> Formatos soportados: .wav (hasta 50MB)
+              </div>
+            </form>
+            
+            <div class="alert alert-info" role="alert">
+              <i class="bi bi-lightbulb"></i> Consejo: Para mejores resultados, usa archivos de audio con buena relación señal/ruido
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   
-  <div id="resultados" class="mt-4" style="display: none;">
+  <div id="resultados" class="mt-4" style="display: none; background-color: var(--text-color);">
     <h3 class="text-center">Resultados del Análisis</h3>
     <div class="table-responsive">
         <table class="table table-bordered table-striped table-hover">

@@ -1,62 +1,107 @@
 {% extends 'base.html' %}
-{% block title %}TP SyS{% endblock %}
+{% block title %}TP SyS - Análisis Acústico{% endblock %}
 {% block body %}
-<section id="banner" class="oculto">
-    <div class="container">
-    <h1>Cálculo de parámetros acústicos ISO 3382</h1>
-    <p>Grupo 2</p>
+<!-- Hero Section -->
+<section class="hero-section py-5" style="background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('{{ url_for('static', filename='img/banner.png') }}') no-repeat center center; background-size: cover; position: relative; color: white;">
+    <div class="container py-5">
+        <div class="row align-items-center">
+            <div class="col-lg-8 mx-auto text-center oculto">
+                <h1 class="display-4 fw-bold mb-3">Análisis de Parámetros Acústicos</h1>
+                <p class="lead mb-4" style="color: white;">Herramienta desarrollada como proyecto académico para el 
+                    cálculo de parámetros acústicos según la norma ISO 3382</p>
+                <div class="d-flex gap-3 justify-content-center mt-4">
+                    <a href="{{ url_for('generar_sonidos_page') }}" class="btn btn-primary btn-lg px-4">
+                        <i class="bi bi-lightning-charge me-2"></i>Comenzar Análisis
+                    </a>
+                    <a href="#objetivos" class="btn btn-outline-light btn-lg px-4">
+                        <i class="bi bi-info-circle me-2"></i>Más Información
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
-<section class="container oculto">
-    <div class="row align-items-center text-center">
-        <div class="col">
-            <img src="{{ url_for('static', filename='img/signal.png') }}" alt="ISO 3382" class="img-fluid">
-        </div>
-        <div class="col-md-6">
-            <h2>¿Qué es la ISO 3382?</h2>
-            <p>La norma ISO 3382 establece métodos para medir y calcular 
-                parámetros acústicos en salas, como el tiempo de reverberación y la claridad del sonido.</p>
-        </div>
-    </div><br>
-    <div class="row align-items-center text-center">
-        <div class="col">
-            <h2>Que pingo es esto?</h2>
-            <p>La norma ISO 3382, se ve desde una perspectiva muy interesante</p>
-        </div>
-        <div class="col">
-            <img src="{{ url_for('static', filename='img/sine-wave.jpg') }}" alt="ISO 3382" class="img-fluid">
-        </div>
-    </div><br>
-</section>
-<section id="info" class="oculto">
+
+<!-- Objetivos -->
+<section id="objetivos" class="py-5">
     <div class="container">
-        <h2 class="title">¿Que hacemos?</h2><br>
-        <div class="row text-center">
-            <div class="col">
-                <h3>Obtencion RI</h3>
-                <p>La norma ISO 3382 define métodos para medir y calcular 
-                    parámetros acústicos en salas, como el tiempo de reverberación y la claridad del sonido.</p>
-            </div>
-            <div class="col">
-                <h3>Parametros acústicos</h3>
-                <p>Utilizando un micrófono y un altavoz, se mide el sonido en 
-                    diferentes puntos de la sala para calcular los parámetros acústicos.</p>
-            </div>
-            <div class="col">
-                <h3>tu vieja</h3>
-                <p>Utilizando un micrófono y un altavoz, se mide el sonido en 
-                    diferentes puntos de la sala para calcular los parámetros acústicos.</p>
-            </div>
-        </div><br>
         <div class="row justify-content-center">
-            <div class="col-auto">
-                <button class="btn btn-dark btn-lg" href="{{ url_for('generar_sonidos_page') }}">
-                    Obtener IR</button>
-            </div>
-            <div class="col-auto">
-                <button class="btn btn-dark btn-lg" href="{{ url_for('analizar_RI_page') }}">
-                    Cargar IR</button>
+            <div class="col-lg-10 oculto">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h2 class="h4 mb-4">Sobre el Proyecto</h2>
+                        <p>Este proyecto fue desarrollado como parte de la materia 
+                            <b>Señales y Sistemas</b> de la Universidad Nacional de Tres de Febrero,
+                            con el objetivo de crear una herramienta práctica para el análisis de parámetros acústicos según la norma ISO 3382.</p>
+                        
+                        <div class="row mt-4 g-4">
+                            <div class="col-md-6">
+                                <h3 class="h5">Objetivos Principales</h3>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> Implementar algoritmos para el cálculo de parámetros acústicos</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> Crear una interfaz intuitiva para el análisis de datos</li>
+                                    <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i> Facilitar el estudio de la acústica de recintos</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h3 class="h5">Características Técnicas</h3>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><i class="bi bi-code-slash text-primary me-2"></i> Desarrollado en Python con Flask</li>
+                                    <li class="mb-2"><i class="bi bi-git text-primary me-2"></i> Código abierto y disponible en GitHub</li>
+                                    <li class="mb-2"><i class="bi bi-graph-up text-primary me-2"></i> Visualización interactiva de datos</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+    </div>
+</section>
+
+<!-- Herramientas -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5 oculto">
+            <h2 class="fw-bold">Herramientas Disponibles</h2>
+            <p class="text-muted">Explora las funcionalidades de nuestra plataforma</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4 oculto">
+                <div class="card h-100 border-0 shadow-sm hover-scale">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <h3 class="h5 mb-0">Análisis de Respuesta al Impulso</h3>
+                        </div>
+                        <p class="text-muted mb-0">Calcula y visualiza la respuesta al impulso de un recinto a partir de mediciones de campo.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Herramienta 2 -->
+            <div class="col-md-4 oculto">
+                <div class="card h-100 border-0 shadow-sm hover-scale">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <h3 class="h5 mb-0">Cálculo de Parámetros</h3>
+                        </div>
+                        <p class="text-muted mb-0">Obtén parámetros acústicos como T20, T30, C50, C80, EDT y más, según la norma ISO 3382.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Herramienta 3 -->
+            <div class="col-md-4 oculto">
+                <div class="card h-100 border-0 shadow-sm hover-scale">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <h3 class="h5 mb-0">Visualización de Datos</h3>
+                        </div>
+                        <p class="text-muted mb-0">Genera gráficos y visualizaciones interactivas para analizar los resultados de tus mediciones.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
 {% endblock %}

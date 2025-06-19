@@ -101,34 +101,93 @@ function mostrarResultados(data) {
     const encabezadosFrecuencias = document.getElementById('encabezadosFrecuencias');
     const cuerpoTabla = document.getElementById('cuerpoTabla');
     
-    // Clear previous results
+    // Clear previous results and build new layout
     resultadosDiv.innerHTML = `
-        <div class="table-responsive">
-            <table class="table table-bordered table-striped" id="tablaResultados">
-                <thead class="table-dark">
-                    <tr id="encabezadosFrecuencias"></tr>
-                </thead>
-                <tbody id="cuerpoTabla"></tbody>
-            </table>
-        </div>
-        <h3>Gráficos</h3>
-        <p>Estos gráficos muestran el dominio temporal y de frecuencia de la señal, así como el análisis de respuesta al impulso.</p>
-        <div class="mt-4 text-center">
-        <div class="row">
-            <div class="col">
-            <img src="/static/img/temp/time_domain_plot.png" alt="Dominio temporal de la señal" class="img-fluid rounded shadow mb-2">
-            <p class="text-muted">Dominio temporal de la señal</p>
+        <div class="card shadow mb-4">
+            <div class="card-header fondo-azul text-white">
+                <h4 class="mb-0"><i class="bi bi-graph-up me-2"></i>Resultados del Análisis</h4>
             </div>
-            <div class="col">
-            <img src="/static/img/temp/time_domain_plot_hilbert.png" alt="Dominio temporal de la señal con envolvente" class="img-fluid rounded shadow mb-2">
-            <p class="text-muted">Dominio temporal de la señal con envolvente</p>
+            <div class="card-body">
+                <div class="alert alert-info" role="alert">
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    A continuación se muestran los parámetros acústicos calculados para la señal analizada, junto con las visualizaciones correspondientes.
+                </div>
+                
+                <div class="table-responsive mb-5">
+                    <h5 class="mb-3">Parámetros Acústicos por Banda de Frecuencia</h5>
+                    <table class="table table-hover table-bordered" id="tablaResultados">
+                        <thead class="table-light">
+                            <tr id="encabezadosFrecuencias"></tr>
+                        </thead>
+                        <tbody id="cuerpoTabla" class="table-group-divider"></tbody>
+                    </table>
+                </div>
+
+                <div class="mt-5">
+                    <h5 class="mb-4 pb-2 border-bottom"><i class="bi bi-graph-up me-2"></i>Visualizaciones</h5>
+                    <p class="text-muted mb-4">Los siguientes gráficos muestran diferentes aspectos de la señal analizada, incluyendo su comportamiento en el dominio del tiempo y la frecuencia, así como el análisis detallado de la respuesta al impulso.</p>
+                    
+                    <div class="row g-4 mb-4">
+                        <div class="col-lg-6">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0">Dominio Temporal</h6>
+                                </div>
+                                <div class="card-body text-center">
+                                    <img src="/static/img/temp/time_domain_plot.png" alt="Dominio temporal" class="img-fluid rounded">
+                                    <p class="text-muted mt-2 mb-0">Representación de la señal en el dominio del tiempo</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0">Envolvente suavizada (Hilbert + media móvil)</h6>
+                                </div>
+                                <div class="card-body text-center">
+                                    <img src="/static/img/temp/time_domain_plot_hilbert.png" alt="Envolvente suavizada con promedio móvil" class="img-fluid rounded">
+                                    <p class="text-muted mt-2 mb-0">Señal con su envolvente calculada mediante transformada de Hilbert</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-4">
+                        <div class="col-lg-6">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0">Análisis de Respuesta al Impulso</h6>
+                                </div>
+                                <div class="card-body text-center">
+                                    <img src="/static/img/temp/grafico_1000.png" alt="Respuesta al impulso" class="img-fluid rounded">
+                                    <p class="text-muted mt-2 mb-0">Señal filtrada a 1kHz con integración de Schroeder</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0">Espectro de Frecuencias</h6>
+                                </div>
+                                <div class="card-body text-center">
+                                    <img src="/static/img/temp/freq_domain_plot.png" alt="Espectro de frecuencias" class="img-fluid rounded">
+                                    <p class="text-muted mt-2 mb-0">Distribución de energía en el dominio de la frecuencia</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="row">
-            <img src="/static/img/temp/grafico_1000.png" alt="Análisis de respuesta al impulso" class="img-fluid rounded shadow mb-2">
-            <p class="text-muted">Figura en escala dB de señal filtrada a 1kHz, con su correspondiente señal de Schroeder</p>
-        </div>
-    `;
+        
+        <div class="alert alert-light mt-4" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-lightbulb-fill text-warning me-2"></i>
+                <div>
+                    <strong>Consejo:</strong> Para obtener los mejores resultados, asegúrese de que la señal de entrada tenga una buena relación señal/ruido y esté libre de distorsiones.
+                </div>
+            </div>
+        </div>`;
     
     // Get references to the recreated elements
     const newEncabezadosFrecuencias = document.getElementById('encabezadosFrecuencias');

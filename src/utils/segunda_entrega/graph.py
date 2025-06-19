@@ -1,10 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from .otras_func import get_output_filepath
+from ..tercer_entrega.otras_func import get_output_filepath
 from .escala_log import escala_log
-from ..tercer_entrega.suavizado import hilbert_transform
+from ..tercer_entrega.suavizado import hilbert_transform,filtro_promedio_movil
 
-def graficar_dominio_temporal(signal,fs, hilbert=False):
+def graficar_dominio_temporal(signal,fs, hilbert=False, ):
     """
     Grafica la señal en el dominio temporal.
 
@@ -34,11 +34,13 @@ def graficar_dominio_temporal(signal,fs, hilbert=False):
     t = np.arange(len(signal)) / fs
     plt.figure(figsize=(10, 4))
     if hilbert:
-        envolvente = hilbert_transform(signal)
+        envolvente = filtro_promedio_movil(hilbert_transform(signal), L=50)
     plt.plot(t, signal, color='m',label='Señal original')
     if hilbert:
-        plt.plot(t, envolvente, color='b',linewidth=2,label='Envolvente')
-        plt.xlim(0.02,0.05)
+        plt.plot(t, envolvente, color='b', alpha=0.8,linewidth=2,label='Envolvente')
+        # Encontrar el índice del valor máximo
+        indice_max = np.argmax(envolvente)
+        plt.xlim(t[indice_max] - 0.005, t[indice_max] + 0.1)
     # Configuración del gráfico
     plt.xlabel('Tiempo (s)',fontsize=12)
     plt.ylabel('Amplitud',fontsize=12)
@@ -134,8 +136,8 @@ def graficar_resultados(freq, datos_debug,fs):
     plt.xlabel('Tiempo (s)',fontsize=12)
     plt.ylabel('Nivel (dB)',fontsize=12)
     plt.grid(True, which='both', linestyle='--', alpha=0.6)
-    plt.legend(fontsize=12)
-    plt.ylim(max(nivel_ruido - 20, -100), 5) # Límite dinámico del eje Y
+    plt.legend(fontsize=15)
+    plt.ylim(max(nivel_ruido - 40, -120), 2) # Límite dinámico del eje Y
     plt.xlim(0, max(tiempo_cruce * 1.2, 1.0)) # Límite dinámico del eje X
     out_file = get_output_filepath(f'grafico_{freq}.png',2,('static','img','temp'))
     plt.tight_layout()

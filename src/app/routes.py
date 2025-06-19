@@ -1,9 +1,7 @@
-from flask import render_template, request, jsonify, session
+from flask import render_template, request, jsonify
 import io
-import numpy as np
 import soundfile as sf
 from utils.primer_entrega.generacion_sonidos import generar_sweep_inverse, wav_to_b64
-from utils.segunda_entrega.graficar import fig_to_png_response, graficar_dominio_temporal
 from utils.params_from_ri import obtener_parametros_de_RI
 from utils.segunda_entrega.graph import graficar_resultados,graficar_dominio_temporal,graficar_espectro
 from utils.segunda_entrega.obtener_sintetizar_ri import sintetizar_RI
@@ -46,7 +44,9 @@ def validar_funcionamiento():
             
             graficar_resultados(1000,datos_graf,ri['fs'])
             graficar_dominio_temporal(ri['audio_data'],ri['fs'])
+            graficar_dominio_temporal(ri['audio_data'],ri['fs'],hilbert=True)
             graficar_espectro(ri['audio_data'],ri['fs'])
+
             return jsonify({"status": "success", "data": parametros_acusticos}), 200
         except Exception as e:
             return jsonify({"status": "error", "message": str(e)}), 400
@@ -60,6 +60,7 @@ def generar():
     f1 = float(request.form.get('f_inferior'))
     f2 = float(request.form.get('f_superior'))
 
+    
     sweep, inverse_sweep, fs = generar_sweep_inverse(
         duracion=duracion,
         fs=44100,
@@ -69,7 +70,7 @@ def generar():
     
     sweep_b64 = wav_to_b64(sweep, fs)
     inverse_b64 = wav_to_b64(inverse_sweep, fs)
-    
+
     return render_template(
         'resultado.html',
         audio_sweep_b64=sweep_b64,
@@ -103,19 +104,3 @@ def file_upload():
         "status": "success",
         "data": parametros_acusticos
     }), 200
-
-@app.route("/plot")
-def plot():
-    signal_id = request.args.get('id')
-    if not signal_id:
-        return "Error: Falta el parámetro 'id' de la señal.", 400
-
-    fs = session.get('fs', 44100)
-    signal_data = session.get('signals', {}).get(signal_id)
-    
-    if not signal_data:
-        return "Error: No se encontró una señal con ese ID.", 404
-
-    signal_a_graficar = np.array(signal_data)
-    fig = graficar_dominio_temporal(signal_a_graficar, fs)
-    return fig_to_png_response(fig)
