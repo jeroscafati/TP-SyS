@@ -1,6 +1,6 @@
 import soundfile as sf
 import numpy as np
-from utils.tercer_entrega.otras_func import get_output_filepath
+from .otras_func import get_output_filepath
 
 def sintetizar_RI(frecuencias: dict,
                   fs: int = 44100,

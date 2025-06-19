@@ -106,6 +106,9 @@ body {
 #resultados .table-responsive {
   padding: 0 4rem;
 }
+.img-fluid{
+  padding: 0 4rem;
+}
 
 /* Estilos mínimos para simular un “modal” */
 #miModal {

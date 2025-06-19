@@ -5,6 +5,7 @@ import soundfile as sf
 from utils.primer_entrega.generacion_sonidos import generar_sweep_inverse, wav_to_b64
 from utils.segunda_entrega.graficar import fig_to_png_response, graficar_dominio_temporal
 from utils.params_from_ri import obtener_parametros_de_RI
+from utils.segunda_entrega.graph import graficar_resultados,graficar_dominio_temporal,graficar_espectro
 from utils.segunda_entrega.obtener_sintetizar_ri import sintetizar_RI
 from utils.tercer_entrega.otras_func import array_multicanal_a_1d
 from utils.constantes.filtros import FRECUENCIAS_OCTAVA
@@ -37,10 +38,15 @@ def validar_funcionamiento():
             frecuencias_converted = {int(freq): values for freq, values in frecuencias.items()}
             ri = sintetizar_RI(frecuencias_converted, piso_ruido_db=ruido_piso_db)
 
-            parametros_acusticos = obtener_parametros_de_RI(ri['audio_data'],
+            parametros_acusticos,datos_graf = obtener_parametros_de_RI(ri['audio_data'],
                                                           ri['fs'],
                                                           banda='octava',
-                                                          ventana_suavizado_ms=5)
+                                                          ventana_suavizado_ms=5,
+                                                          debug_mode=True)
+            
+            graficar_resultados(1000,datos_graf,ri['fs'])
+            graficar_dominio_temporal(ri['audio_data'],ri['fs'])
+            graficar_espectro(ri['audio_data'],ri['fs'])
             return jsonify({"status": "success", "data": parametros_acusticos}), 200
         except Exception as e:
             return jsonify({"status": "error", "message": str(e)}), 400
@@ -85,7 +91,14 @@ def file_upload():
         return jsonify(error=f'Error al leer WAV: {str(e)}'), 400
 
     audio_data_mono = array_multicanal_a_1d(audio_data)
-    parametros_acusticos = obtener_parametros_de_RI(audio_data_mono, fs, banda='octava', ventana_suavizado_ms=5)
+    parametros_acusticos, datos_graf = obtener_parametros_de_RI(audio_data_mono, fs, banda='octava', ventana_suavizado_ms=5,debug_mode=True)
+    
+    # Graficos
+    graficar_resultados(1000,datos_graf,fs)
+    graficar_dominio_temporal(audio_data_mono,fs)
+    graficar_dominio_temporal(audio_data_mono,fs,hilbert=True)
+    graficar_espectro(audio_data_mono,fs)
+
     return jsonify({
         "status": "success",
         "data": parametros_acusticos
