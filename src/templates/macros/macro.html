@@ -1,0 +1,22 @@
+{# Macros for frequency-related form inputs #}
+{% macro frequency_input(freq) %}
+    <div class="card mb-3">
+        <div class="card-header">
+            <h5 class="mb-0">{{ freq }} Hz</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="t60_{{ freq }}" class="form-label">Decaimiento T60 (segundos)</label>
+                    <input type="number" step="0.01" class="form-control" id="t60_{{ freq }}" 
+                           name="t60_{{ freq }}" value="1.5" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="amp_{{ freq }}" class="form-label">Amplitud</label>
+                    <input type="number" step="0.01" class="form-control" id="amp_{{ freq }}" 
+                           name="amp_{{ freq }}" value="1.0" required>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endmacro %}

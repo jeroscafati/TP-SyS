@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% block body %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="text-center mb-4">
+        <h2 class="fw-bold mb-3" style="color: var(--secondary-color);">Señales generadas</h2>
+        <p class="text-muted mb-3">Reproduce o descarga las señales generadas</p>
+        <a href="{{ url_for('generar_sonidos_page') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-repeat me-1"></i>Generar otro barrido
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <!-- Sweep Card -->
+        <div class="col-lg-6">
+            <div class="card shadow-lg h-100 border-0 rounded-4 overflow-hidden hover-scale">
+                <div class="card-header bg-light border-bottom py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0" style="color: var(--secondary-color);"><i class="bi bi-graph-up me-2"></i>Barrido Directo</h5>
+                        <span class="badge text-white" style="background-color: var(--accent-color);">Sweep</span>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <div class="audio-player mb-4">
+                        <audio controls class="w-100" id="sweepPlayer">
+                            <source src="data:audio/wav;base64,{{ audio_sweep_b64 }}" type="audio/wav">
+                            Tu navegador no soporta el elemento de audio.
+                        </audio>
+                    </div>
+                    <div class="d-grid">
+                        <a href="data:audio/wav;base64,{{ audio_sweep_b64 }}" 
+                           download="{{ filename_sweep }}" 
+                           class="btn" style="border-color: var(--accent-color); color: var(--accent-color);">
+                            <i class="bi bi-download me-2"></i>Descargar Sweep
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inverse Sweep Card -->
+        <div class="col-lg-6">
+            <div class="card shadow-lg h-100 border-0 rounded-4 overflow-hidden hover-scale">
+                <div class="card-header bg-light border-bottom py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0" style="color: var(--secondary-color);"><i class="bi bi-graph-down me-2"></i>Barrido Inverso</h5>
+                        <span class="badge text-white" style="background-color: var(--accent-color);">Inverse</span>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <div class="audio-player mb-4">
+                        <audio controls class="w-100" id="inversePlayer">
+                            <source src="data:audio/wav;base64,{{ audio_inverse_b64 }}" type="audio/wav">
+                            Tu navegador no soporta el elemento de audio.
+                        </audio>
+                    </div>
+                    <div class="d-grid">
+                        <a href="data:audio/wav;base64,{{ audio_inverse_b64 }}" 
+                           download="{{ filename_inverse }}" 
+                           class="btn" style="border-color: var(--accent-color); color: var(--accent-color);">
+                            <i class="bi bi-download me-2"></i>Descargar Inverse
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Card -->
+    <div class="card border mt-4">
+        <div class="card-body p-3">
+            <div class="d-flex align-items-center">
+                <div class="flex-shrink-0 text-muted">
+                    <i class="bi bi-info-circle"></i>
+                </div>
+                <div class="ms-2 small">
+                    <strong>¿Cómo usar estas señales?</strong>
+                    <p class="mb-0">
+                        El barrido directo mide la respuesta al impulso de una sala. 
+                        El barrido inverso procesa la grabación para obtener la respuesta al impulso.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.hover-scale {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+.hover-scale:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,.1)!important;
+}
+.audio-player {
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 12px;
+    border: 1px solid #eee;
+}
+audio {
+    width: 100%;
+    height: 36px;
+}
+</style>
+{% endblock %}
