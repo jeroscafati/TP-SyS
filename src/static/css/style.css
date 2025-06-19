@@ -4,6 +4,7 @@
   --text-color: #f2f2f2;
   --highlight-color: #ad5418;
   --fondo-banner: url("../img/Sine_waves_different_frequencies.svg.png");
+  --accent-color: #748ab7;
 }
 
 .oculto {
@@ -47,8 +48,15 @@ body {
 .dropdown-menu {
   background-color: var(--secondary-color);
 }
+.navbar-nav .nav-link:hover {
+  font-weight: bold;
+}
+.navbar-nav .dropdown-menu .dropdown-item:hover {
+  background-color: var(--primary-color);
+  font-weight: bold;
+}
 #materia {
-  background-color: #0a0c0f;
+  background-color: var(--secondary-color);
     color: var(--text-color);
 }
 #banner {
@@ -81,7 +89,23 @@ body {
   color: var(--text-color);
   padding: 2rem;
 }
-
+#resultados table {
+  border: 1px solid var(--primary-color);
+  border-collapse: collapse;
+}
+#resultados table thead tr:first-child th {
+  background-color: var(--primary-color);
+  color: var(--text-color);
+  border: 1px solid black;
+}
+#resultados thead th:first-child, #resultados tbody td:first-child {
+  background-color: var(--accent-color);
+  color: var(--text-color);
+  border: 1px solid black;
+}
+#resultados .table-responsive {
+  padding: 0 4rem;
+}
 
 /* Estilos mínimos para simular un “modal” */
 #miModal {

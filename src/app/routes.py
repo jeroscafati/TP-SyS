@@ -1,11 +1,17 @@
 from flask import render_template, request, jsonify, session
+import io
 import numpy as np
+import soundfile as sf
 from utils.primer_entrega.generacion_sonidos import generar_sweep_inverse, wav_to_b64
 from utils.segunda_entrega.graficar import fig_to_png_response, graficar_dominio_temporal
 from utils.params_from_ri import obtener_parametros_de_RI
 from utils.segunda_entrega.obtener_sintetizar_ri import sintetizar_RI
+from utils.tercer_entrega.otras_func import array_multicanal_a_1d
 from utils.constantes.filtros import FRECUENCIAS_OCTAVA
 from . import app  
+
+# Limitar tamaño máximo del body a 50MB
+app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024
 
 @app.route('/')
 def home_page():
@@ -68,7 +74,22 @@ def generar():
 
 @app.route('/file_upload', methods=['POST'])
 def file_upload():
-    return "Funcionalidad de carga de archivos en desarrollo"
+    wav_file = request.files['file']
+    
+    if not wav_file:
+        return jsonify(error='No se recibió audio_wav'), 400
+
+    try:
+        audio_data, fs = sf.read(io.BytesIO(wav_file.read()))
+    except RuntimeError as e:
+        return jsonify(error=f'Error al leer WAV: {str(e)}'), 400
+
+    audio_data_mono = array_multicanal_a_1d(audio_data)
+    parametros_acusticos = obtener_parametros_de_RI(audio_data_mono, fs, banda='octava', ventana_suavizado_ms=5)
+    return jsonify({
+        "status": "success",
+        "data": parametros_acusticos
+    }), 200
 
 @app.route("/plot")
 def plot():

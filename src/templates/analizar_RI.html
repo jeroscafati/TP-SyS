@@ -2,7 +2,26 @@
 {% block body %}
   <h3>Subir archivo wav</h3><br>
   <form method="post" action="{{url_for('file_upload')}}" enctype="multipart/form-data">
-    <input type="file" name="file" accept=".wav, audio/wav">
-    <input type="submit" value="Subir Archivo">
+    <input type="file" id="file" name="file" accept=".wav, audio/wav">
+    <button type="button" onclick="uploadFile()" class="btn btn-primary">Cargar Archivo</button>
   </form><br><br>
+  
+  <div id="resultados" class="mt-4" style="display: none;">
+    <h3 class="text-center">Resultados del Análisis</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped table-hover">
+            <thead class="thead-dark">
+                <tr id="encabezadosFrecuencias">
+                    <!-- Frequencies will be added here as column headers -->
+                </tr>
+            </thead>
+            <tbody id="cuerpoTabla">
+                <!-- Parameter rows will be added here -->
+            </tbody>
+        </table>
+    </div>
+  </div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/funcs.js') }}"></script>
 {% endblock %}
