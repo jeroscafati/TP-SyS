@@ -1,7 +1,7 @@
 from flask import render_template, request, jsonify
 import io
 import soundfile as sf
-from utils.primer_entrega.generacion_sonidos import generar_sweep_inverse, wav_to_b64
+from utils.primer_entrega.funcs import generar_sweep_inverse, wav_to_b64
 from utils.params_from_ri import obtener_parametros_de_RI
 from utils.segunda_entrega.graph import graficar_resultados,graficar_dominio_temporal,graficar_espectro
 from utils.segunda_entrega.obtener_sintetizar_ri import sintetizar_RI

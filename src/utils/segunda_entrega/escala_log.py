@@ -1,5 +1,5 @@
 import numpy as np  
-
+    
 def escala_log(signal):
     """
     Convierte un array a escala logarítmica normalizada.

@@ -2,7 +2,8 @@ import numpy as np
 import pandas as pd
 import soundfile as sf
 import sounddevice as sd
-
+from io import BytesIO
+import base64
 def ruidoRosa_voss_editado(t, fs=44100, ncols=16):
     """
     Genera ruido rosa utilizando el algoritmo de Voss-McCartney.
@@ -113,9 +114,13 @@ def generar_sweep_inverse(duracion,fs=44100 ,f_inferior=20 ,f_superior=20000):
     sweep /= np.max(np.abs(sweep))
     inverse_sweep /= np.max(np.abs(inverse_sweep))
 
-    return {'sweep_data': sweep,
-            'inverse_data': inverse_sweep,
-            'fs': fs} 
+    return sweep.astype(np.float32), inverse_sweep.astype(np.float32), fs
+
+def wav_to_b64(signal, fs):
+    buf = BytesIO()
+    sf.write(buf, signal, fs, format='WAV')
+    buf.seek(0)
+    return base64.b64encode(buf.read()).decode('ascii')
 
 def grabar_reproducir(signal,fs=44100):
     """

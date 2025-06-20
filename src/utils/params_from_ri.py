@@ -9,41 +9,52 @@ def obtener_parametros_de_RI(ri,fs,banda='octava',ventana_suavizado_ms=5,debug_m
     Procesa una respuesta al impulso multibanda y calcula sus parámetros acústicos.
 
     Esta función toma la señal de respuesta al impulso sintetizada o cargada,
-    la filtra en bandas de octava (o tercio de octava), extrae la envolvente
+    la filtra en bandas de octava o tercio de octava, extrae la envolvente
     mediante transformada de Hilbert y promedio móvil, aplica la integración
     inversa de Schroeder, la convierte a escala logarítmica y finalmente estima
     los principales tiempos de reverberación (EDT, T20, T30, etc.) para cada banda.
 
     Parámetros:
-    -----------
-    signal : Array 1d que contiene la señal de respuesta.
+    ----------
+    signal : numpy.ndarray
+        Array 1D que contiene la señal de respuesta al impulso.
     fs : int
         Frecuencia de muestreo de la señal (Hz).
     banda : {'octava', 'tercio_octava'}, opcional
-        Por defecto 'octava'.
+        Tipo de banda de frecuencia a utilizar. Debe ser 'octava' o 'tercio_octava'.
+        Por defecto: 'octava'.
     ventana_suavizado_ms : float, opcional
         Duración de la ventana de promedio móvil para suavizar la envolvente,
-        en milisegundos. Por defecto 5 ms.
+        en milisegundos. Por defecto: 5 ms.
+    debug_mode : bool, opcional
+        Si es True, habilita la impresión de información de depuración.
+        Por defecto: False.
 
     Retorna:
     --------
-    parametros_acusticos : dict
-        Diccionario cuyos keys son las frecuencias centrales de cada banda (Hz)
-        y cuyos values son a su vez diccionarios con los parámetros acústicos
-        calculados:
+    dict
+        Diccionario cuyas claves son las frecuencias centrales de cada banda (float, Hz)
+        y cuyos valores son diccionarios con los siguientes parámetros acústicos (todos float):
           - 'EDT'            : Early Decay Time (s)
           - 'T60_from_T10'   : Tiempo de reverberación estimado de -5 a -15 dB (s)          
           - 'T60_from_T20'   : Tiempo de reverberación estimado de -5 a -25 dB (s)
           - 'T60_from_T30'   : Tiempo de reverberación estimado de -5 a -35 dB (s)
           - 'C80'            : Claridad C80 en dB
-          - 'D50'            : Porcentaje de energía en los primeros 50 ms
-    Ejemplo de uso:
-    ---------------
-    >>> result = obtener_parametros_de_RI(ri_sintetizada, fs=48000,
-                                          banda='tercio_octava',
-                                          ventana_suavizado_ms=10)
-    >>> print(result[1000]['T60_from_T30'])
-    1.23
+          - 'D50'            : Porcentaje de energía en los primeros 50 ms (valor entre 0 y 1)
+
+    Ejemplo:
+    --------
+    >>> import numpy as np
+    >>> from utils.params_from_ri import obtener_parametros_de_RI
+    >>> ri_sintetizada = np.random.randn(48000)  # Ejemplo de señal
+    >>> fs = 48000
+    >>> result = obtener_parametros_de_RI(
+    ...     ri_sintetizada, fs=fs,
+    ...     banda='tercio_octava',
+    ...     ventana_suavizado_ms=10,
+    ...     debug_mode=True
+    ... )
+    >>> print(f"T30 a 1kHz: {result[1000]['T60_from_T30']:.2f} s")
     """
 
     ventana_suavizado_muestras = int(ventana_suavizado_ms*1e-3 * fs)

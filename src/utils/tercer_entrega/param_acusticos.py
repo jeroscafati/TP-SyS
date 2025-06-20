@@ -3,22 +3,30 @@ from utils.tercer_entrega.linear_fit import regresion_lineal_en_intervalo
 
 def calcular_D50_C80(p2: np.ndarray, fs: int) -> dict:
     """
-    Calcula D50 y C80 a partir de la señal p²(t).
+    Calcula los parámetros D50 (definición) y C80 (claridad) a partir de la energía de la señal.
 
     Parámetros
     ----------
     p2 : np.ndarray
         Energía instantánea muestreada, es decir, p(t)**2, de longitud N.
+        Debe ser un array 1D de valores no negativos.
     fs : int
-        Frecuencia de muestreo en Hz.
+        Frecuencia de muestreo en Hz. Debe ser un valor positivo.
 
     Retorna
     -------
     dict
-        {
-          'D50' : float,  # porcentaje de energía en los primeros 50 ms
-          'C80' : float   # claridad C80 en dB
-        }
+        Un diccionario con las siguientes claves:
+        - 'D50' : float
+            Porcentaje de energía en los primeros 50 ms. Rango [0, 100].
+        - 'C80' : float
+            Claridad C80 en dB, definida como 10*log10(E_early/E_late),
+            donde E_early es la energía hasta 80ms y E_late es la energía restante.
+
+    Notas
+    -----
+    - Si la energía total es cero, D50 se establece a 0.
+    - C80 puede ser -inf si no hay energía tardía.
     """
     
     # --- D50 ---
@@ -45,22 +53,48 @@ def calcular_D50_C80(p2: np.ndarray, fs: int) -> dict:
 
 def calcular_parametros_acusticos(signal_db, p2: np.ndarray, fs: int, return_regs=False) -> dict:
     """
-    Calcula todos los parámetros acústicos a partir de una curva de decaimiento.
-    
-    Argumentos:
-    - signal_db: Array con la curva de decaimiento de Schroeder en dB.
+    Calcula los parámetros acústicos principales a partir de una curva de decaimiento.
+
+    Parámetros
+    ----------
+    signal_db : np.ndarray
+        Curva de decaimiento de Schroeder en escala logarítmica (dB).
     p2 : np.ndarray
-        Energía instantánea muestreada, es decir, p(t)**2, de longitud N.
-    schroeder : np.ndarray
-        Integral de Schroeder: para cada muestra k, 
-        schroeder[k] ≈ ∫_{t_k}^∞ p²(τ) dτ.
+        Energía instantánea muestreada, p(t)**2, de la misma longitud que signal_db.
     fs : int
         Frecuencia de muestreo en Hz.
-    Retorna:
-    - dict con los parámetros calculados para esa curva.
-    Dict: {"EDT":,"T60_from_T10":,"T60_from_T20":,"T60_from_T30":,'D50':,'C80':}
-    """
+    return_regs : bool, opcional
+        Si es True, retorna información adicional sobre las regresiones lineales.
+        Por defecto es False.
 
+    Retorna
+    -------
+    dict or tuple
+        Si return_regs es False (por defecto), retorna un diccionario con:
+        {
+            'EDT': float,            # Early Decay Time (s)
+            'T60_from_T10': float,   # T60 estimado del tramo -5 a -15 dB
+            'T60_from_T20': float,   # T60 estimado del tramo -5 a -25 dB
+            'T60_from_T30': float,   # T60 estimado del tramo -5 a -35 dB
+            'D50': float,            # Definición (0-100%)
+            'C80': float             # Claridad en dB
+        }
+        
+        Si return_regs es True, retorna una tupla (dic, regs) donde:
+        - dic: el diccionario descrito arriba
+        - regs: diccionario con los parámetros de las regresiones lineales:
+            {
+                'EDT': dict,  # Parámetros de la regresión para EDT
+                'T10': dict,  # Parámetros de la regresión para T10
+                'T20': dict,  # Parámetros de la regresión para T20
+                'T30': dict   # Parámetros de la regresión para T30
+            }
+
+    Notas
+    -----
+    - La señal se normaliza internamente para que su máximo sea 0 dB.
+    - Los tiempos de reverberación se calculan asumiendo un decaimiento lineal.
+    """
     #Vector de tiempo
     t = np.arange(len(signal_db))/fs
 
