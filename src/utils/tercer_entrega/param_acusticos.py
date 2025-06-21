@@ -47,7 +47,10 @@ def calcular_D50_C80(p2: np.ndarray, fs: int) -> dict:
     E_early_80 = np.sum(p2[:N80])       
     E_late_80  = np.sum(p2[N80:])     
 
-    C80 = 10.0 * np.log10(E_early_80 / E_late_80)
+    # Evitar log(0): forzar un mínimo valor positivo
+    E_late_80_clipped = np.clip(E_late_80, 1e-10, None)
+
+    C80 = 10.0 * np.log10(E_early_80 / E_late_80_clipped)
 
     return {'D50': D50, 'C80': C80}
 
