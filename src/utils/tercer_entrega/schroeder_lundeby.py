@@ -1,5 +1,6 @@
 import numpy as np
-from utils.tercer_entrega.linear_fit_y_db_scale import regresion_lineal_en_intervalo, escala_log
+from utils.segunda_entrega.escala_log import escala_log
+from utils.tercer_entrega.linear_fit import regresion_lineal_en_intervalo
 
 def calcular_rms_por_bloques(ir, fs, ms_bloque=20):
     """
@@ -48,6 +49,43 @@ def calcular_rms_por_bloques(ir, fs, ms_bloque=20):
     return {'rms_por_bloque':rms_por_bloque,'tamano_bloque': tamano_bloque}
 
 def lundeby(ri, fs, ms_bloque=20, max_iter=6, tol_cruce=1e-3, return_debug_data=False):
+    """
+    Implementa el algoritmo de Lundeby para encontrar el punto de cruce entre el
+    decaimiento de la respuesta al impulso y el ruido de fondo.
+
+    Parámetros
+    ----------
+    ri : np.ndarray
+        Respuesta al impulso (suavizada).
+    fs : float
+        Frecuencia de muestreo en Hz.
+    ms_bloque : float, opcional
+        Duración de cada bloque en milisegundos. Por defecto 20 ms.
+    max_iter : int, opcional
+        Número máximo de iteraciones. Por defecto 6.
+    tol_cruce : float, opcional
+        Tolerancia para considerar convergida la iteración. Por defecto 1e-3.
+    return_debug_data : bool, opcional
+        Si True, devuelve un diccionario con los datos de depuración.
+
+    Retorna
+    -------
+    idx_cruce : int
+        Índice de la muestra que marca el punto de cruce entre el decaimiento y el ruido.
+    o
+    debug_data : dict
+        Diccionario con los datos de depuración:
+        'nivel_ruido': float, nivel de ruido final en dB.
+        'slope': float, pendiente final de la regresión lineal.
+        'intercept': float, ordenada al origen de la regresión lineal.
+        'tiempo_cruce': float, tiempo del punto de cruce en segundos.
+        'idx_cruce': int, índice de la muestra del punto de cruce.
+        'iteraciones': int, número de iteraciones realizadas.
+        'convergencia': bool, indica si la iteración convergió.
+        'tiempo_rms': np.ndarray, array de tiempos (en segundos) de la señal RMS.
+        'schroeder_db': np.ndarray, array con la integral de Schroeder en dB.
+    """ 
+
     # 1) RMS por bloques
     rms = calcular_rms_por_bloques(ri, fs, ms_bloque)
     rms_vals = rms['rms_por_bloque']
@@ -128,21 +166,21 @@ def lundeby(ri, fs, ms_bloque=20, max_iter=6, tol_cruce=1e-3, return_debug_data=
       
         return debug_data
       
-def integral_schroeder(p: np.ndarray, fs: float, t_lundeby: int = None):
+def integral_schroeder(p: np.ndarray, fs: float, t_lundeby: int = None) -> dict:
     """
     Calcula la integral de Schroeder hasta el tiempo de Lundeby y descarta
     la energía más allá de ese punto (ruido de fondo).
 
-    Parámetros
+    Parameters
     ----------
     p : np.ndarray
         Respuesta al impulso (suavizada).
-    t_lundeby : int
+    t_lundeby : int, optional
         Índice de muestra que marca el fin de la parte útil (cruce Lundeby).
     fs : float
         Frecuencia de muestreo en Hz.
 
-    Retorna
+    Returns
     -------
     schroeder : np.ndarray
         Integral de Schroeder cortada en t_lundeby:
@@ -168,4 +206,3 @@ def integral_schroeder(p: np.ndarray, fs: float, t_lundeby: int = None):
     S[t_lundeby:] = 0.0
 
     return {'schroeder':S,'p2':p2}
-

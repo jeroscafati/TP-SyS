@@ -1,11 +1,12 @@
 import soundfile as sf
 import numpy as np
-from utils.tercer_entrega.otras_func import get_output_filepath
+from ..tercer_entrega.otras_func import get_output_filepath
 
 def sintetizar_RI(frecuencias: dict,
                   fs: int = 44100,
                   piso_ruido_db: float = -60.0,
-                  delay_s: float = 0.5):
+                  delay_s: float = 0.5,
+                  exportar_wav: bool = False):
     """
     Sintetiza una respuesta al impulso (RI) multibanda con ruido y la guarda como WAV.
 
@@ -28,7 +29,9 @@ def sintetizar_RI(frecuencias: dict,
     delay_s : float, opcional
         Duración del retraso inicial agregado en segundos (antes de la RI).
         Por defecto 0.5 s.
-
+    exportar_wav : bool, opcional
+        Si True, exporta la RI sintetizada como WAV.
+        Por defecto False.
     Retorna:
     --------
     dict:
@@ -78,16 +81,21 @@ def sintetizar_RI(frecuencias: dict,
     
     #7 Exportar RI
     #Ruta del archivo
-    out_file = get_output_filepath('ri_sintetizada.wav',levels_up=3)
-    
-    # Guardar la señal sintetizada como un archivo WAV
-    ri_int16 = (ri_ruido * 32767).astype(np.int16)
-    sf.write(str(out_file), ri_int16, fs)
+    if exportar_wav:
+        out_file = get_output_filepath('ri_sintetizada.wav',levels_up=3,subdirs=('audios','temp'))
+        
+        # Guardar la señal sintetizada como un archivo WAV
+        ri_int16 = (ri_ruido * 32767).astype(np.int16)
+        sf.write(str(out_file), ri_int16, fs)
 
     return {'audio_data':ri_ruido,
             'fs':fs}
 
-def obtener_RI_por_deconvolucion(grabacion, filtro_inverso,filename="RI_sweep.wav",fs=44100):
+def obtener_RI_por_deconvolucion(grabacion, 
+                            filtro_inverso,
+                            fs=44100,
+                            exportar_wav=False,
+                            filename="RI_por_deconvolucion.wav"):
     """
     Devuelve la respuesta al impulso h[n] = (grabacion * filtro_inverso) en el dominio del tiempo,
     usando multiplicación de espectros (FFT).
@@ -124,15 +132,13 @@ def obtener_RI_por_deconvolucion(grabacion, filtro_inverso,filename="RI_sweep.wa
     #4. Normalizar la respuesta al impulso
     RI /= np.max(np.abs(RI))
     
-    #5 Convertir a PCM16 para exportar
-    ri_int16 = (RI * 32767).astype(np.int16)
-    out_file = get_output_filepath(filename,levels_up=3)
-
-    #6. Exportamos como wav
-    sf.write(str(out_file), ri_int16, fs)
+    if exportar_wav:
+        #5 Convertir a PCM16 para exportar
+        ri_int16 = (RI * 32767).astype(np.int16)
+        out_file = get_output_filepath(filename,levels_up=3,subdirs=('audios','temp'))
+        sf.write(out_file, ri_int16, fs)
 
     return {'audio_data': RI,
              'fs': fs}
-
 
 
