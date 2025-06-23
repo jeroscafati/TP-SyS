@@ -16,29 +16,29 @@ piso_rudio_db = -50
 
 audio, fs_audio = sf.read('audios/clifford_tower_S1R1_Bformat.wav')
 #diccionario de valores para comparar, tabulados de OPENAIR.
-tab_clifford_tower = {125:{'T60':2.17,'EDT':1.93,'D50':23.39,'C80':-2.80},
-            250:{'T60':2.34,'EDT':2.68,'D50':17.03,'C80':-3.44}, 
-            500: {'T60':2.61,'EDT':2.93,'D50':31.20,'C80':-1.76}, 
-            1000:{'T60':2.39,'EDT':2.38,'D50':39.95,'C80':-0.19}, 
-            2000: {'T60':2.05,'EDT':1.78,'D50':63.71,'C80':4.13}, 
-            4000: {'T60':1.40,'EDT':0.90,'D50':76.52,'C80':7.09}, 
-            8000: {'T60':1.02,'EDT':0.63,'D50':81.03,'C80':8.74}}
+tab_clifford_tower = {125:{'T60_from_T20':2.20,'T60_from_T30':2.25,'EDT':1.94,'D50': 63.2,'C80':3.08},
+            250:{'T60_from_T20':2.59,'T60_from_T30': 2.63,'EDT':2.88,'D50':46.9,'C80':0.12}, 
+            500: {'T60_from_T20':2.84,'T60_from_T30': 2.85,'EDT':2.92,'D50':61.1,'C80':2.59}, 
+            1000:{'T60_from_T20':2.51,'T60_from_T30': 2.6,'EDT':2.44,'D50':75.0,'C80': 5.28}, 
+            2000: {'T60_from_T20':2.03,'T60_from_T30':2.09,'EDT':1.78,'D50': 48.8,'C80':0.89}, 
+            4000: {'T60_from_T20':1.37,'T60_from_T30':1.4,'EDT':1.25,'D50': 77.8,'C80':6.33}, 
+            8000: {'T60_from_T20':0.96,'T60_from_T30':0.99,'EDT':0.74,'D50':79.4,'C80':6.57}}
 
-tab_alcuin_college = {125:{'T60':1.99,'EDT':1.51,'D50':0.46,'C80':1.04},
-            250:{'T60':1.49,'EDT':1.89,'D50':0.32,'C80':-1.86}, 
-            500: {'T60':1.61,'EDT':1.89,'D50':0.47,'C80':0.44}, 
-            1000:{'T60':1.83,'EDT':1.89,'D50':0.61,'C80':2.48}, 
-            2000: {'T60':1.77,'EDT':1.89,'D50':0.34,'C80':-1.58}, 
-            4000: {'T60':1.52,'EDT':1.51,'D50':0.61,'C80':3.67}, 
-            8000: {'T60':1.2,'EDT':1.51,'D50':0.65,'C80':3.74}}
+tab_alcuin_college = {125:{'T60_from_T20':1.95,'T60_from_T30':1.9,'EDT':2.28,'D50':63.2,'C80':3.08},
+            250:{'T60_from_T20':1.53,'T60_from_T30':1.62,'EDT':2.16,'D50':46.9,'C80':0.12}, 
+            500: {'T60_from_T20':1.41,'T60_from_T30':1.68,'EDT':3.14,'D50':61.1,'C80':2.59}, 
+            1000:{'T60_from_T20':1.77,'T60_from_T30':1.99,'EDT':4.20,'D50':75.0,'C80':5.28}, 
+            2000: {'T60_from_T20':1.69,'T60_from_T30':1.95,'EDT':2.3,'D50':48.8,'C80':0.89}, 
+            4000: {'T60_from_T20':1.52,'T60_from_T30':1.66,'EDT':2.73,'D50':77.8,'C80':6.33}, 
+            8000: {'T60_from_T20':1.27,'T60_from_T30':1.17,'EDT':2.93,'D50':79.4,'C80':6.57}}
 
-tab_lyons_concert_hall = {125:{'T60':2.18,'EDT':1.7,'D50':0.25,'C80':-0.66},
-            250:{'T60':2.05,'EDT':2.21,'D50':0.12,'C80':-3.54}, 
-            500: {'T60':1.89,'EDT':2.08,'D50':0.15,'C80':-2.86}, 
-            1000:{'T60':1.86,'EDT':2.08,'D50':0.19,'C80':-2.84}, 
-            2000: {'T60':1.69,'EDT':1.82,'D50':0.2,'C80':-2.37}, 
-            4000: {'T60':1.28,'EDT':1.44,'D50':0.33,'C80':0.46}, 
-            8000: {'T60':0.9,'EDT':1.06,'D50':0.41,'C80':2.63}}
+tab_lyons_concert_hall = {125:{'T60_from_T20':2.04,'T60_from_T30':2.11,'EDT':2.26,'D50':16.3,'C80':-4.88},
+            250:{'T60_from_T20':2.56,'T60_from_T30':2.18,'EDT':2.56,'D50':20.3,'C80':-5.00}, 
+            500: {'T60_from_T20':2.36,'T60_from_T30':1.79,'EDT':2.36,'D50':8.8,'C80':-6.49}, 
+            1000:{'T60_from_T20':2.35,'T60_from_T30':1.79,'EDT':2.35,'D50':18.2,'C80':-4.44}, 
+            2000: {'T60_from_T20':1.92,'T60_from_T30':1.72,'EDT':1.92,'D50':33.9,'C80':-1.41}, 
+            4000: {'T60_from_T20':1.41,'T60_from_T30':1.31,'EDT':1.41,'D50':41.9,'C80':0.69}, 
+            8000: {'T60_from_T20':0.82,'T60_from_T30':0.88,'EDT':0.82,'D50':69.5,'C80':5.87}}
 
 
 if __name__ == "__main__":
@@ -127,10 +127,11 @@ if __name__ == "__main__":
             print("\n<--------RESULTADOS-------------->\n")
             for freq, params in parametros_acusticos.items():
                 print(f"Frecuencia: {freq} Hz")
-                print(f"T60 TABULADO:{tab[freq]['T60']}s")
-                print(f"t60 de T30: {params['T60_from_T30']:.2f}s/ {100*(params['T60_from_T30']-tab[freq]['T60'])/tab[freq]['T60']:.1f}% de dif.")
-                print(f"t60 de T20: {params['T60_from_T20']:.2f}s/ {100*(params['T60_from_T20']-tab[freq]['T60'])/tab[freq]['T60']:.1f}% de dif.")
-                print(f"t60 de T10: {params['T60_from_T10']:.2f}s/ {100*(params['T60_from_T10']-tab[freq]['T60'])/tab[freq]['T60']:.1f}% de dif.")
+                print(f"T60 de T30 TABULADO:{tab[freq]['T60_from_T30']}s")
+                print(f"t60 de T30: {params['T60_from_T30']:.2f}s/ {100*(params['T60_from_T30']-tab[freq]['T60_from_T30'])/tab[freq]['T60_from_T30']:.1f}% de dif.")
+                print(f"T60 de T20 TABULADO:{tab[freq]['T60_from_T20']}s")
+                print(f"t60 de T20: {params['T60_from_T20']:.2f}s/ {100*(params['T60_from_T20']-tab[freq]['T60_from_T20'])/tab[freq]['T60_from_T20']:.1f}% de dif.")
+                print(f"t60 de T10: {params['T60_from_T10']:.2f}s/")
                 print(f"EDT TABULADO: {tab[freq]['EDT']}s")
                 print(f"EDT: {params['EDT']:.2f}s/ {100*(params['EDT']-tab[freq]['EDT'])/tab[freq]['EDT']:.1f}% de dif.")
                 print(f"C80 TABULADO: {tab[freq]['C80']}")
