@@ -96,7 +96,7 @@ def obtener_RI_por_deconvolucion(grabacion,
                             fs=44100,
                             exportar_wav=False,
                             filename="RI_por_deconvolucion.wav"):
-    """
+   """
     Devuelve la respuesta al impulso h[n] = (grabacion * filtro_inverso) en el dominio del tiempo,
     usando multiplicación de espectros (FFT).
 
@@ -110,9 +110,9 @@ def obtener_RI_por_deconvolucion(grabacion,
 
     Returns
     -------
-    h : ndarray (1D)
-        Respuesta al impulso lineal h[n] = y[n] * k[n], de longitud len(grabacion) + len(filtro_inverso) - 1.
-        Es un array real (dtype float) con la RI normalizada
+    dict:
+        'audio_data' (np.ndarray): Respuesta al impulso sintetizada con forma (n_samples,) y valores en [-1,1].
+        'fs'         (int)      : Frecuencia de muestreo de la señal.
 
     """
     # 1. Longitud que debería tener la convolución lineal:
