@@ -96,7 +96,7 @@ def obtener_RI_por_deconvolucion(grabacion,
                             fs=44100,
                             exportar_wav=False,
                             filename="RI_por_deconvolucion.wav"):
-   """
+    """
     Devuelve la respuesta al impulso h[n] = (grabacion * filtro_inverso) en el dominio del tiempo,
     usando multiplicación de espectros (FFT).
 
