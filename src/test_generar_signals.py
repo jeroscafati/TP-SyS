@@ -28,6 +28,7 @@ if __name__ == "__main__":
             generar_sweep_inverse(t,fs,f_inf,f_sup,write_wav=True)
             if ruido_rosa:
                 ruidoRosa_voss_editado(t,fs)
+            print('\nAudios guardados en:\nTP-SyS/audios/temp')
         case '2':
             print("\n<-----------SELECCIONAR-------------->\n")
             t = float(input("ingrese duracion del sweep en segundos:"))
@@ -56,3 +57,4 @@ if __name__ == "__main__":
             obtener_RI_por_deconvolucion(sweep_1d, filter_1d, 
                                                     exportar_wav=True)
             print('Operacion finalizada.')
+            print('\nAudio guardado en:\nTP-SyS/audios/temp')
